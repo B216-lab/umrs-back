@@ -1,14 +1,9 @@
 package com.b216.umrs.features.movement.domain;
 
 import com.b216.umrs.infrastructure.persistence.JsonNodeStringConverter;
-import com.b216.umrs.features.movement.domain.MovementTypeRef;
-import com.b216.umrs.features.movement.domain.PlaceTypeRef;
-import com.b216.umrs.features.movement.domain.VehicleTypeRef;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
