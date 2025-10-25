@@ -1,0 +1,10 @@
+.git
+.idea
+.vscode
+build
+out
+**/.DS_Store
+**/Thumbs.db
+**/*.iml
+
+
