@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiGroupsConfig {
 
     @Bean
-    public GroupedOpenApi apiV1() { // legacy
+    public GroupedOpenApi apiV0() { // legacy
         return GroupedOpenApi.builder()
-            .group("v1")
+            .group("v0")
             .pathsToMatch("/api/v0/**")
             .build();
     }
