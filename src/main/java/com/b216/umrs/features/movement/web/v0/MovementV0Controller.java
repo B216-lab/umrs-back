@@ -1,4 +1,4 @@
-package com.b216.umrs.features.movement.web.v1;
+package com.b216.umrs.features.movement.web.v0;
 
 import com.b216.umrs.features.movement.domain.Movement;
 import com.b216.umrs.features.movement.domain.MovementTypeRef;
@@ -6,23 +6,16 @@ import com.b216.umrs.features.movement.domain.PlaceTypeRef;
 import com.b216.umrs.features.movement.domain.VehicleTypeRef;
 import com.b216.umrs.features.movement.repository.MovementRepository;
 import jakarta.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * V1 контроллер для CRUD операций с Movement с упрощённой моделью DTO.
@@ -48,6 +41,15 @@ public class MovementV0Controller {
     public ResponseEntity<MovementDto> create(@Valid @RequestBody MovementDto dto) {
         Movement saved = movementRepository.save(fromDto(dto, new Movement()));
         return ResponseEntity.status(HttpStatus.CREATED).body(toDto(saved));
+    }
+
+    @GetMapping
+    public ResponseEntity<java.util.List<MovementDto>> getAll() {
+        java.util.List<MovementDto> result = movementRepository.findAll()
+            .stream()
+            .map(this::toDto)
+            .toList();
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("/{id}")
