@@ -35,6 +35,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.session:spring-session-data-redis")
+	// OpenAPI (springdoc) for MVC and Spring Data REST
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 	// Spatial support for PostGIS (Hibernate 6)
 	implementation("org.hibernate.orm:hibernate-spatial")
 	compileOnly("org.projectlombok:lombok")

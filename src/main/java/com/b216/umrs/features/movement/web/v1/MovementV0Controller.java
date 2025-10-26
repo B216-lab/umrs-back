@@ -5,9 +5,8 @@ import com.b216.umrs.features.movement.domain.MovementTypeRef;
 import com.b216.umrs.features.movement.domain.PlaceTypeRef;
 import com.b216.umrs.features.movement.domain.VehicleTypeRef;
 import com.b216.umrs.features.movement.repository.MovementRepository;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -29,12 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
  * V1 контроллер для CRUD операций с Movement с упрощённой моделью DTO.
  */
 @RestController
-@RequestMapping("/api/v1/movements")
-public class MovementV1Controller {
+@RequestMapping("/api/v0/movements")
+public class MovementV0Controller {
 
     private final MovementRepository movementRepository;
 
-    public MovementV1Controller(MovementRepository movementRepository) {
+    public MovementV0Controller(MovementRepository movementRepository) {
         this.movementRepository = movementRepository;
     }
 
