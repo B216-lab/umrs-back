@@ -63,4 +63,82 @@ INSERT INTO ref_vehicle_type(code, description_ru) VALUES
     ('SERVICE','служебный транспорт')
 ON CONFLICT (code) DO NOTHING;
 
+-- Create movements table (JSONB for places, FKs to reference tables)
+CREATE TABLE IF NOT EXISTS movements (
+    uuid UUID PRIMARY KEY,
+    movement_type_id INTEGER NOT NULL REFERENCES ref_movement_type(id),
+    departure_time TIMESTAMPTZ,
+    destination_time TIMESTAMPTZ,
+    day DATE,
+    departure_place JSONB,
+    destination_place JSONB,
+    departure_place_type_id INTEGER NOT NULL REFERENCES ref_place_type(id),
+    destination_place_type_id INTEGER NOT NULL REFERENCES ref_place_type(id),
+    vehicle_type_id INTEGER NULL REFERENCES ref_vehicle_type(id),
+    cost NUMERIC(12,2),
+    waiting_time INTEGER,
+    seats_amount INTEGER
+);
+
+-- Seed sample movements
+INSERT INTO movements(
+    uuid,
+    movement_type_id,
+    departure_time,
+    destination_time,
+    day,
+    departure_place,
+    destination_place,
+    departure_place_type_id,
+    destination_place_type_id,
+    vehicle_type_id,
+    cost,
+    waiting_time,
+    seats_amount
+) VALUES (
+    '11111111-1111-1111-1111-111111111111'::uuid,
+    (SELECT id FROM ref_movement_type WHERE code = 'TRANSPORT'),
+    '2025-10-25T08:15:00Z',
+    '2025-10-25T08:55:00Z',
+    '2025-10-25',
+    '{"type":"Point","coordinates":[37.6173,55.7558]}'::jsonb,
+    '{"type":"Point","coordinates":[37.64,55.76]}'::jsonb,
+    (SELECT id FROM ref_place_type WHERE code = 'HOME_RESIDENCE'),
+    (SELECT id FROM ref_place_type WHERE code = 'WORKPLACE'),
+    (SELECT id FROM ref_vehicle_type WHERE code = 'METRO'),
+    62.00,
+    3,
+    1
+) ON CONFLICT (uuid) DO NOTHING;
+
+INSERT INTO movements(
+    uuid,
+    movement_type_id,
+    departure_time,
+    destination_time,
+    day,
+    departure_place,
+    destination_place,
+    departure_place_type_id,
+    destination_place_type_id,
+    vehicle_type_id,
+    cost,
+    waiting_time,
+    seats_amount
+) VALUES (
+    '22222222-2222-2222-2222-222222222222'::uuid,
+    (SELECT id FROM ref_movement_type WHERE code = 'ON_FOOT'),
+    '2025-10-26T09:00:00Z',
+    '2025-10-26T09:20:00Z',
+    '2025-10-26',
+    '{"type":"Point","coordinates":[37.60,55.75]}'::jsonb,
+    '{"type":"Point","coordinates":[37.61,55.76]}'::jsonb,
+    (SELECT id FROM ref_place_type WHERE code = 'HOME_RESIDENCE'),
+    (SELECT id FROM ref_place_type WHERE code = 'STORE_MARKET'),
+    NULL,
+    0.00,
+    0,
+    0
+) ON CONFLICT (uuid) DO NOTHING;
+
 
