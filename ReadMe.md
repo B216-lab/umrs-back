@@ -1,13 +1,30 @@
 # UMRS backend
 
+## Новый API
+
+- `http://localhost:8080/redoc-v1.html` - [Redoc](https://redocly.com/redoc)
+- `http://localhost:8080/docs/v1` - [Open API](https://swagger.io/specification/) JSON
+
+## Legacy API пока не переехали
+
+- `http://localhost:8080/redoc-v0.html` - [Redoc](https://redocly.com/redoc)
+- `http://localhost:8080/docs/v0` - [Open API](https://swagger.io/specification/) JSON
+
 # Решения
-- `Spring MVC` (в `WebFlux` точно нет необходимости в начале сейчас, важна скорость разработки и надежность)
-- Don't use direct connection between front-end and back-end using these sweet "database security rules" or that kind of stuff, because of CVE-2024-45489 and increasing complexity of supporting these rules as DB's schema is growing ([look](https://youtu.be/2zcN2aQsUdc?si=80NfsuOA2KI770CH))
+
+- `Spring MVC` (в `WebFlux` точно нет необходимости в начале сейчас, важна скорость разработки, надежность и перспектива
+  масштабирования)
+- Не использовать прямое соединение между фронт-эндом и бэк-эндом, используя эти "database security rules" или что-то в
+  этом роде, из-за CVE-2024-45489 и растущей сложности поддержки этих правил по мере роста схемы
+  БД (см.(https://youtu.be/2zcN2aQsUdc?si=80NfsuOA2KI770CH)).
 
 # Почему не supabase (было в планах)
 
 - Supabase - это fauxpen source на самом деле в какой-то незначительной (зависит от случая) мере.
 - В ошибках, в репозиториях этого Supabase, можно найти немало недовольных политикой работы с open source community
-- Supabase обновляется регулярно, не сильно обращая внимания на документирование для self-hosted, а его инфраструктура не самая простая и поддерживать её, конфигурировать или справляться с появляющимися по тем или иным причинам ошибками - сложная задача, подсильная или прям нормальным специалистм, или разработчикам supabase (субъективно)
-- Немало неприятных ограничений в self-hosted версии. Самым критичным является запрет создания более одного проекта в одном instance'е Supabase, но помимо этого, там ещё хватает неудобств разного рода.
+- Supabase обновляется регулярно, не сильно обращая внимания на документирование для self-hosted, а его инфраструктура
+  не самая простая и поддерживать её, конфигурировать или справляться с появляющимися по тем или иным причинам
+  ошибками - сложная задача, подсильная или прям нормальным специалистм, или разработчикам supabase (субъективно)
+- Немало неприятных ограничений в self-hosted версии. Самым критичным является запрет создания более одного проекта в
+  одном instance'е Supabase, но помимо этого, там ещё хватает неудобств разного рода.
 
