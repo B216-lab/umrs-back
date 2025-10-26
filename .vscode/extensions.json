@@ -3,6 +3,9 @@
         "vscjava.vscode-java-debug",
         "redhat.java",
         "vscjava.vscode-spring-boot-dashboard",
-        "vmware.vscode-spring-boot"
+        "vmware.vscode-spring-boot",
+        "ms-azuretools.vscode-containers",
+        "anysphere.remote-containers",
+        "exiasr.hadolint"
     ]
 }
