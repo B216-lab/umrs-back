@@ -1,0 +1,24 @@
+name: Check build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feat/*
+  pull_request:
+    branches:
+      -main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Spring Gradle Build Action
+        uses: spring-io/spring-gradle-build-action@v2
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+      - name: Build project
+        run: ./gradlew build
