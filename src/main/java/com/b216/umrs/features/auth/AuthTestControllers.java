@@ -1,8 +1,8 @@
 package com.b216.umrs.features.auth;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 public class AuthTestControllers {
@@ -29,5 +29,4 @@ public class AuthTestControllers {
     public String publicTest() {
         return "This endpoint is public.";
     }
-}
 }
