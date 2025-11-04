@@ -52,6 +52,11 @@ public class MovementV0Controller {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<MovementDto> update(@PathVariable("id") UUID id, @Valid @RequestBody MovementDto dto) {
         return movementRepository.findById(id)
