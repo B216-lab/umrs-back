@@ -142,3 +142,110 @@ INSERT INTO movements(
 ) ON CONFLICT (uuid) DO NOTHING;
 
 
+-- Table for roles
+CREATE TABLE IF NOT EXISTS roles (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Table for scopes
+CREATE TABLE IF NOT EXISTS scopes (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Table for users
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    enabled BOOLEAN DEFAULT true,
+    locked BOOLEAN DEFAULT false,
+    last_login DATE DEFAULT CURRENT_DATE,
+    creation_date DATE DEFAULT CURRENT_DATE
+);
+
+-- Association table: users_roles (Many-to-Many between users and roles)
+CREATE TABLE IF NOT EXISTS users_roles (
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+-- Association table: users_scopes (Many-to-Many between users and scopes)
+CREATE TABLE IF NOT EXISTS users_scopes (
+    user_id BIGINT NOT NULL,
+    scope_id BIGINT NOT NULL,
+    PRIMARY KEY (user_id, scope_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (scope_id) REFERENCES scopes(id) ON DELETE CASCADE
+);
+
+-- Association table: role_scopes (Many-to-Many between roles and scope strings)
+CREATE TABLE IF NOT EXISTS role_scopes (
+    role_id BIGINT NOT NULL,
+    scope VARCHAR(255) NOT NULL,
+    PRIMARY KEY (role_id, scope),
+    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+
+
+
+-- Insert test roles (only columns: id, name)
+INSERT INTO roles (id, name) VALUES
+    (101, 'ADMIN'),
+    (102, 'MANAGER'),
+    (103, 'USER'),
+    (104, 'DEVELOPER')
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert test scopes (only columns: id, name)
+INSERT INTO scopes (id, name) VALUES
+    (201, 'READ'),
+    (202, 'WRITE'),
+    (203, 'UPDATE'),
+    (204, 'DELETE')
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert test users with explicit long integer ids
+INSERT INTO users (id, username, password, enabled) VALUES
+    (1001, 'test_employee@local.dev',  '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true), -- password: qwerty
+    (1002, 'test_manager@local.dev',   '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true), -- password: qwerty
+    (1003, 'power_admin@local.dev',    '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true)  -- password: qwerty
+ON CONFLICT (id) DO NOTHING;
+
+-- Assign roles to users (using explicit long integer ids)
+INSERT INTO users_roles (user_id, role_id) VALUES
+    (1001, 103), -- test_employee@local.dev => USER
+    (1002, 102), -- test_manager@local.dev => MANAGER
+    (1003, 101)  -- power_admin@local.dev => ADMIN
+ON CONFLICT DO NOTHING;
+
+-- Assign scopes to users (using explicit long integer ids)
+INSERT INTO users_scopes (user_id, scope_id) VALUES
+    (1001, 201), -- test_employee@local.dev => READ
+    (1002, 201), -- test_manager@local.dev => READ
+    (1002, 202), -- test_manager@local.dev => WRITE
+    (1003, 201), -- power_admin@local.dev => READ
+    (1003, 202), -- power_admin@local.dev => WRITE
+    (1003, 203), -- power_admin@local.dev => UPDATE
+    (1003, 204)  -- power_admin@local.dev => DELETE
+ON CONFLICT DO NOTHING;
+
+-- Example assignment of scopes directly to roles via role_scopes table
+INSERT INTO role_scopes (role_id, scope) VALUES
+    (101, 'READ'),
+    (101, 'WRITE'),
+    (101, 'UPDATE'),
+    (101, 'DELETE'),
+    (102, 'READ'),
+    (102, 'WRITE'),
+    (103, 'READ'),
+    (104, 'READ')
+ON CONFLICT DO NOTHING;
+
+
+
