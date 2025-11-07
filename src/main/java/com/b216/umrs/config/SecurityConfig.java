@@ -4,6 +4,7 @@ import com.b216.umrs.features.auth.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -22,10 +24,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // TODO enable and configure
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/developers/**").hasRole(Role.DEVELOPER.name())
-                .requestMatchers("/api/v1/managers/**").hasRole(Role.MANAGER.name())
+                .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
+                .requestMatchers("/api/v1/manager/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
+                .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.name(), Role.DEVELOPER.name(), Role.MANAGER.name(), Role.ADMIN.name())
                 .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
-                .requestMatchers("/api/v1/users/**").hasRole(Role.USER.name())
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v0/movements/").permitAll()
@@ -42,7 +44,8 @@ public class SecurityConfig {
             .exceptionHandling(exceptionHandlingConfigurer -> {
                 exceptionHandlingConfigurer.accessDeniedPage("/access-denied");
             })
-            .httpBasic(basic -> {})
+            .httpBasic(basic -> {
+            })
             .formLogin(form -> form.disable());
 
         return http.build();

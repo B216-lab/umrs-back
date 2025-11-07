@@ -1,6 +1,5 @@
 package com.b216.umrs.features.auth;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,20 +10,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class AuthTestControllers {
 
-    @GetMapping("/employees")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public String employeeTest() {
-        return "You are an EMPLOYEE!";
+    @GetMapping("/developer")
+    public String developerTest() {
+        return "You are an DEVELOPER!";
     }
 
-    @GetMapping("/managers")
-    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/manager")
     public String managerTest() {
         return "You are a MANAGER!";
     }
 
+    @GetMapping("/user")
+    public String userTest() {
+        return "You are an USER!";
+    }
+
     @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
     public String adminTest() {
         return "You are an ADMIN!";
     }
