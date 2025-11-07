@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.name(), Role.DEVELOPER.name(), Role.MANAGER.name(), Role.ADMIN.name())
                 .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
                 .requestMatchers("/api/v1/public/**").permitAll()
+                .requestMatchers("/api/v1/signup/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v0/movements/").permitAll()
                 .requestMatchers("/login").permitAll()
