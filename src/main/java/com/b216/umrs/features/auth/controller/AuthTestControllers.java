@@ -1,4 +1,4 @@
-package com.b216.umrs.features.auth;
+package com.b216.umrs.features.auth.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

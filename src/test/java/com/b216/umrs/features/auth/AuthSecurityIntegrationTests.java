@@ -1,6 +1,7 @@
 package com.b216.umrs.features.auth;
 
 import com.b216.umrs.config.SecurityConfig;
+import com.b216.umrs.features.auth.controller.AuthTestControllers;
 import com.b216.umrs.features.auth.model.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -68,7 +69,7 @@ class AuthSecurityIntegrationTests {
         api.perform(get(this.endpointPrefix + "/user"))
             .andExpect(status().isUnauthorized());
     }
-    
+
     @ParameterizedTest
     @EnumSource(
         value = Role.class,
