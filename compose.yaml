@@ -17,25 +17,26 @@ services:
       timeout: 5s
       retries: 5
 
-  rabbitmq:
-    image: 'rabbitmq:latest'
-    environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
-    ports:
-      - '32780:5672'
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 3
+  # it's loading too slow with that, but it will be useful later
+  # rabbitmq:
+  #   image: 'rabbitmq:latest'
+  #   environment:
+  #     - 'RABBITMQ_DEFAULT_PASS=secret'
+  #     - 'RABBITMQ_DEFAULT_USER=myuser'
+  #   ports:
+  #     - '32780:5672'
+  #   healthcheck:
+  #     test: rabbitmq-diagnostics -q ping
+  #     interval: 30s
+  #     timeout: 30s
+  #     retries: 3
 
-  redis:
-    image: 'redis:8.2.2-alpine'
-    ports:
-      - '32781:6379'
-    healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+  # redis:
+  #   image: 'redis:8.2.2-alpine'
+  #   ports:
+  #     - '32781:6379'
+  #   healthcheck:
+  #     test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
 
 volumes:
   db-data:
