@@ -1,0 +1,32 @@
+<configuration>
+    <!-- Console appender для вывода в консоль -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %logger{56} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File appender для записи в файл -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Путь к файлу логов из application.properties -->
+        <file>${logging.file.path:-logs}/myapp.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- ежедневная ротация и до 10MB на файл -->
+            <!-- Паттерн для архивных файлов: logs/myapp.2024-01-15.0.log -->
+            <!-- Активный файл всегда logs/myapp.log, архивные получают дату -->
+            <fileNamePattern>${logging.file.path:-logs}/myapp.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %logger{56} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
+
