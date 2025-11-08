@@ -21,7 +21,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+                httpSecuritySessionManagementConfigurer.maximumSessions(15)
+                    .maxSessionsPreventsLogin(true)
+                    .expiredUrl("/login?expired=true");
+            })
             .csrf(csrf -> csrf.disable()) // TODO enable and configure
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
