@@ -1,11 +1,13 @@
 package com.b216.umrs.features.auth.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class AuthTestControllers {
@@ -33,9 +35,9 @@ public class AuthTestControllers {
     @GetMapping("/public")
     public String publicTest() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("AuthenticatedUser: " + authentication.getName());
+        log.info("AuthenticatedUser: {}", authentication.getName());
         authentication.getAuthorities().forEach(authority -> {
-            System.out.println("GrantedAuthority: " + authority);
+            log.info("GrantedAuthority: {}", authority);
         });
         return "This endpoint is public.";
     }
