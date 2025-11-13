@@ -1,0 +1,29 @@
+###################################### dev environment properties
+spring:
+    application.name: umrs-backend
+    banner.location: banner.txt
+    jpa:
+        hibernate.ddl-auto: update
+    datasource:
+        url: jdbc:postgresql://localhost:32779/mydatabase
+        username: myuser
+        password: secret
+        driver-class-name: org.postgresql.Driver
+    flyway:
+        enabled: true
+        url: ${spring.datasource.url}
+        user: ${spring.datasource.username}
+        password: ${spring.datasource.password}
+    # Spring Data REST base path for rest repositories
+    data.rest.base-path: /api/v1
+    threads.virtual.enabled: true
+logging:
+    level:
+        # root: DEBUG
+        # com.myapp.service=INFO:
+        org.hibernate.SQL: debug
+        org.hibernate.type.descriptor.sql: trace
+        org.springframework.security: DEBUG
+    file.path: logs/myapp.log
+springdoc:
+    api-docs.path: /docs
