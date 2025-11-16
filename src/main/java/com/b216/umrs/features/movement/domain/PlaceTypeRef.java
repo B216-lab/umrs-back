@@ -1,6 +1,10 @@
 package com.b216.umrs.features.movement.domain;
 
+import com.b216.umrs.features.movement.model.PlaceType;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,11 +27,9 @@ public class PlaceTypeRef {
     private Integer id;
 
     @Column(nullable = false, unique = true, length = 128)
-    private String code;
+    @Enumerated(EnumType.STRING)
+    private PlaceType code;
 
     @Column(name = "description_ru", nullable = false, length = 512)
     private String descriptionRu;
-
 }
-
-

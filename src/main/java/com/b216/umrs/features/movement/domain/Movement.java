@@ -2,39 +2,16 @@ package com.b216.umrs.features.movement.domain;
 
 import com.b216.umrs.infrastructure.persistence.JsonNodeStringConverter;
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
 
-/**
- * Сущность перемещения.
- *
- * Поля:
- * - uuid: уникальный идентификатор записи
- * - type: тип перемещения (ref)
- * - departureTime: время отправления
- * - destinationTime: время прибытия
- * - day: календарная дата перемещения
- * - departurePlace: место отправления (GeoJSON)
- * - destinationPlace: место назначения (GeoJSON)
- * - departureType: тип места отправления (ref)
- * - destinationType: тип места назначения (ref)
- * - vehicleType: тип ТС (ref)
- * - cost: стоимость
- * - waitingTime: время ожидания (минуты)
- * - seatsAmount: количество мест
- */
+
 @Entity
 @Table(name = "movements")
 @Getter
@@ -69,6 +46,11 @@ public class Movement {
     @ManyToOne(optional = false)
     @JoinColumn(name = "departure_place_type_id", nullable = false)
     private PlaceTypeRef departureType;
+
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "validation_status_ref", nullable = false)
+    private ValidationStatusRef validationStatusRef;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "destination_place_type_id", nullable = false)
