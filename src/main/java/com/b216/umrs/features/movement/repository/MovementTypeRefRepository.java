@@ -11,7 +11,7 @@ import java.util.Optional;
  * REST-репозиторий для справочника типов перемещений.
  */
 @RepositoryRestResource(path = "movement-types", collectionResourceRel = "movement-types")
-public interface MovementTypeRefRepository extends JpaRepository<MovementTypeRef, Integer> {
+public interface MovementTypeRefRepository extends JpaRepository<MovementTypeRef, Long> {
     Optional<MovementTypeRef> findByCode(MovementType code);
 }
 

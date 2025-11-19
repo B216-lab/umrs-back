@@ -24,9 +24,9 @@ public class VehicleTypeRef {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, unique = true, length = 128)
+    @Column(name = "code", nullable = false, unique = true, length = 128)
     @Enumerated(EnumType.STRING)
     private VehicleType code;
 

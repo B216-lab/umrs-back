@@ -14,6 +14,9 @@ public class SocialStatus {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
-    private com.b216.umrs.features.auth.model.SocialStatus name;
+    @Column(nullable = false, unique = true, length = 64)
+    private com.b216.umrs.features.auth.model.SocialStatus code;
+
+    @Column(name = "description_ru", nullable = false, length = 512)
+    private String descriptionRu;
 }

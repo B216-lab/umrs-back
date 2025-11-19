@@ -11,7 +11,7 @@ import java.util.Optional;
  * REST-репозиторий для справочника типов мест.
  */
 @RepositoryRestResource(path = "place-types", collectionResourceRel = "place-types")
-public interface PlaceTypeRefRepository extends JpaRepository<PlaceTypeRef, Integer> {
+public interface PlaceTypeRefRepository extends JpaRepository<PlaceTypeRef, Long> {
     Optional<PlaceTypeRef> findByCode(PlaceType code);
 }
 

@@ -1,30 +1,30 @@
 -- Create reference tables
 CREATE TABLE IF NOT EXISTS ref_movement_type (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(64) NOT NULL UNIQUE,
     description_ru VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ref_place_type (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(128) NOT NULL UNIQUE,
     description_ru VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ref_vehicle_type (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(128) NOT NULL UNIQUE,
     description_ru VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ref_validation_status (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(128) NOT NULL UNIQUE,
     description_ru VARCHAR(512) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS social_statuses (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     code VARCHAR(64) NOT NULL UNIQUE,
     description_ru VARCHAR(256) NOT NULL
 );
@@ -95,15 +95,16 @@ ON CONFLICT (code) DO NOTHING;
 -- Create movements table (JSONB for places, FKs to reference tables)
 CREATE TABLE IF NOT EXISTS movements (
     uuid UUID PRIMARY KEY,
-    movement_type_id INTEGER NOT NULL REFERENCES ref_movement_type(id),
+    movement_type_id BIGINT NOT NULL REFERENCES ref_movement_type(id),
     departure_time TIMESTAMPTZ,
     destination_time TIMESTAMPTZ,
     day DATE,
     departure_place JSONB,
     destination_place JSONB,
-    departure_place_type_id INTEGER NOT NULL REFERENCES ref_place_type(id),
-    destination_place_type_id INTEGER NOT NULL REFERENCES ref_place_type(id),
-    vehicle_type_id INTEGER NULL REFERENCES ref_vehicle_type(id),
+    departure_place_type_id BIGINT NOT NULL REFERENCES ref_place_type(id),
+    validation_status_id BIGINT NOT NULL REFERENCES ref_validation_status(id),
+    destination_place_type_id BIGINT NOT NULL REFERENCES ref_place_type(id),
+    vehicle_type_id BIGINT NULL REFERENCES ref_vehicle_type(id),
     cost NUMERIC(12,2),
     waiting_time INTEGER,
     seats_amount INTEGER
@@ -118,6 +119,7 @@ INSERT INTO movements(
     day,
     departure_place,
     destination_place,
+    validation_status_id,
     departure_place_type_id,
     destination_place_type_id,
     vehicle_type_id,
@@ -132,6 +134,7 @@ INSERT INTO movements(
     '2025-10-25',
     '{"type":"Point","coordinates":[37.6173,55.7558]}'::jsonb,
     '{"type":"Point","coordinates":[37.64,55.76]}'::jsonb,
+    1,  -- PENDING_REVIEW (id = 1 in ref_validation_status)
     1,  -- HOME_RESIDENCE (id = 1 in ref_place_type)
     3,  -- WORKPLACE (id = 3 in ref_place_type)
     9,  -- METRO (id = 9 in ref_vehicle_type)
@@ -148,6 +151,7 @@ INSERT INTO movements(
     day,
     departure_place,
     destination_place,
+    validation_status_id,
     departure_place_type_id,
     destination_place_type_id,
     vehicle_type_id,
@@ -162,6 +166,7 @@ INSERT INTO movements(
     '2025-10-26',
     '{"type":"Point","coordinates":[37.60,55.75]}'::jsonb,
     '{"type":"Point","coordinates":[37.61,55.76]}'::jsonb,
+    1, -- PENDING_REVIEW (id = 1 in ref_validation_status)
     1, -- HOME_RESIDENCE (id = 1 in ref_place_type)
     12, -- STORE_MARKET (id = 12 in ref_place_type)
     NULL,

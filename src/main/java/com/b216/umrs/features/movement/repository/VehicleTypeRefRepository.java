@@ -11,7 +11,7 @@ import java.util.Optional;
  * REST-репозиторий для справочника типов транспортных средств.
  */
 @RepositoryRestResource(path = "vehicle-types", collectionResourceRel = "vehicle-types")
-public interface VehicleTypeRefRepository extends JpaRepository<VehicleTypeRef, Integer> {
+public interface VehicleTypeRefRepository extends JpaRepository<VehicleTypeRef, Long> {
     Optional<VehicleTypeRef> findByCode(VehicleType code);
 }
 

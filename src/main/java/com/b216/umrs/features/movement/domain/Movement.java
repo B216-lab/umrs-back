@@ -49,8 +49,8 @@ public class Movement {
 
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "validation_status_ref", nullable = false)
-    private ValidationStatusRef validationStatusRef;
+    @JoinColumn(name = "validation_status_id", nullable = false)
+    private ValidationStatusRef validationStatus;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "destination_place_type_id", nullable = false)
