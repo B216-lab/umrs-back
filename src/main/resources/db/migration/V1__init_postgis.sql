@@ -188,10 +188,11 @@ CREATE TABLE IF NOT EXISTS scopes (
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
+-- TODO make username unique after legacy migration
 -- Table for users
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     enabled BOOLEAN DEFAULT true,
     locked BOOLEAN DEFAULT false,

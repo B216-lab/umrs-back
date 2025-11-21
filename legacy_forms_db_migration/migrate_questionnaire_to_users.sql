@@ -176,7 +176,99 @@ BEGIN
     END LOOP;
 END $$;
 
--- Step 4: Add foreign key constraint for new_user_id (optional, but recommended)
--- ALTER TABLE questionnaire ADD CONSTRAINT fk_questionnaire_user 
---     FOREIGN KEY (new_user_id) REFERENCES users(id) ON DELETE RESTRICT;
+-- Step 4: Remove duplicate users and update questionnaire references
+-- This handles cases where the same user might have been created multiple times
+-- Compares users based on multiple columns (gender, salary, home place, etc.) to identify duplicates
+DO $$
+DECLARE
+    duplicate_record RECORD;
+    kept_user_id BIGINT;
+    duplicate_user_id BIGINT;
+    all_duplicate_ids BIGINT[];
+BEGIN
+    -- Find duplicate users by comparing multiple columns that should be unique per person
+    -- Group by: gender, min_salary, max_salary, home_readable_place, home_place
+    -- Users with matching values in these fields are considered duplicates
+    -- PostgreSQL naturally groups NULL values together in GROUP BY
+    FOR duplicate_record IN 
+        SELECT 
+            gender,
+            min_salary,
+            max_salary,
+            home_readable_place,
+            home_place,
+            MIN(id) as kept_id,
+            array_agg(id ORDER BY id) as all_ids
+        FROM users
+        WHERE id NOT IN (1001, 1002, 1003) -- Exclude test users
+        GROUP BY gender, min_salary, max_salary, home_readable_place, home_place
+        HAVING COUNT(*) > 1
+    LOOP
+        kept_user_id := duplicate_record.kept_id;
+        all_duplicate_ids := duplicate_record.all_ids;
+        
+        -- Update all questionnaire records pointing to duplicate users to point to kept user
+        UPDATE questionnaire
+        SET new_user_id = kept_user_id
+        WHERE new_user_id = ANY(all_duplicate_ids)
+          AND new_user_id != kept_user_id;
+        
+        -- Delete duplicate users (keeping the one with lowest id)
+        DELETE FROM users
+        WHERE id = ANY(all_duplicate_ids)
+          AND id != kept_user_id
+          AND id NOT IN (1001, 1002, 1003); -- Exclude test users
+    END LOOP;
+    
+    -- Also handle cases where some fields might be NULL but users are still duplicates
+    -- Compare users that have matching non-NULL fields
+    FOR duplicate_record IN
+        WITH user_comparisons AS (
+            SELECT 
+                u1.id as id1,
+                u2.id as id2
+            FROM users u1
+            INNER JOIN users u2 ON u1.id < u2.id
+            WHERE u1.id NOT IN (1001, 1002, 1003)
+              AND u2.id NOT IN (1001, 1002, 1003)
+              -- Match on gender (required field)
+              AND u1.gender = u2.gender
+              -- Match on salary fields (both NULL or both same value)
+              AND (u1.min_salary IS NULL AND u2.min_salary IS NULL OR u1.min_salary = u2.min_salary)
+              AND (u1.max_salary IS NULL AND u2.max_salary IS NULL OR u1.max_salary = u2.max_salary)
+              -- Match on home_readable_place (both NULL or both same value)
+              AND (u1.home_readable_place IS NULL AND u2.home_readable_place IS NULL 
+                   OR u1.home_readable_place = u2.home_readable_place)
+              -- Match on home_place JSONB (both NULL or both same)
+              AND (u1.home_place IS NULL AND u2.home_place IS NULL 
+                   OR u1.home_place::text = u2.home_place::text)
+              -- Created within a reasonable time window (same migration run)
+              AND ABS(EXTRACT(EPOCH FROM (u1.creation_date - u2.creation_date))) < 300 -- Within 5 minutes
+        )
+        SELECT DISTINCT
+            LEAST(id1, id2) as kept_id,
+            GREATEST(id1, id2) as duplicate_id
+        FROM user_comparisons
+        WHERE id1 IN (SELECT new_user_id FROM questionnaire WHERE new_user_id IS NOT NULL)
+           OR id2 IN (SELECT new_user_id FROM questionnaire WHERE new_user_id IS NOT NULL)
+    LOOP
+        kept_user_id := duplicate_record.kept_id;
+        duplicate_user_id := duplicate_record.duplicate_id;
+        
+        -- Update all questionnaire references from duplicate to kept user
+        UPDATE questionnaire
+        SET new_user_id = kept_user_id
+        WHERE new_user_id = duplicate_user_id;
+        
+        -- Delete the duplicate user (only if no longer referenced)
+        IF NOT EXISTS (SELECT 1 FROM questionnaire WHERE new_user_id = duplicate_user_id) THEN
+            DELETE FROM users
+            WHERE id = duplicate_user_id;
+        END IF;
+    END LOOP;
+END $$;
+
+-- Step 5: Add foreign key constraint for new_user_id (optional, but recommended)
+ALTER TABLE questionnaire ADD CONSTRAINT fk_questionnaire_user 
+    FOREIGN KEY (new_user_id) REFERENCES users(id) ON DELETE RESTRICT;
 
