@@ -1,11 +1,11 @@
-###################################### dev environment properties
+###################################### production environment properties
 spring:
     application.name: umrs-backend
     banner.location: banner.txt
     jpa:
-        hibernate.ddl-auto: update
+        hibernate.ddl-auto: validate
     datasource:
-        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:32779/mydatabase}
+        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/mydatabase}
         username: ${SPRING_DATASOURCE_USERNAME:myuser}
         password: ${SPRING_DATASOURCE_PASSWORD:secret}
         driver-class-name: org.postgresql.Driver
@@ -17,13 +17,13 @@ spring:
     # Spring Data REST base path for rest repositories
     data.rest.base-path: /api/v1
     threads.virtual.enabled: true
+    # Отключает автоматический запуск Docker Compose при запуске в контейнере
+    docker.compose.enabled: false
 logging:
     level:
-        # root: DEBUG
-        # com.myapp.service=INFO:
-        org.hibernate.SQL: debug
-        org.hibernate.type.descriptor.sql: trace
-        org.springframework.security: DEBUG
+        root: INFO
+        com.b216.umrs: INFO
     file.path: logs/myapp.log
 springdoc:
     api-docs.path: /docs
+

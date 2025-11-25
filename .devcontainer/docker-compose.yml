@@ -16,6 +16,8 @@ services:
             - '8080:8080'
         depends_on:
             - postgres
+        networks:
+            - shared-net
 
     postgres:
         image: 'postgis/postgis:18-3.6-alpine'
@@ -27,8 +29,14 @@ services:
             - '32779:5432'
         volumes:
             - postgres-data:/var/lib/postgresql/data
+        networks:
+            - shared-net
 
 volumes:
     gradle-cache:
     postgres-data:
+
+networks:
+    shared-net:
+        external: true
 

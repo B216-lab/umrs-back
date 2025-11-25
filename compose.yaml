@@ -1,4 +1,22 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      - 'SPRING_PROFILES_ACTIVE=prod'
+      - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase'
+      - 'SPRING_DATASOURCE_USERNAME=myuser'
+      - 'SPRING_DATASOURCE_PASSWORD=secret'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - shared-net
+
   postgres:
     image: 'postgis/postgis:18-3.6-alpine'
     environment:
@@ -16,6 +34,12 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared-net
 
 volumes:
     db-data:
+
+networks:
+    shared-net:
+        external: true
