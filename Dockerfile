@@ -12,11 +12,12 @@ RUN chmod +x gradlew \
 
 FROM eclipse-temurin:21-jre-jammy
 ENV SPRING_PROFILES_ACTIVE=prod
+ENV SERVER_PORT=8081
 WORKDIR /app
 
 COPY --from=build /workspace/app/build/libs/*.jar /app/app.jar
 
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/app.jar"]
 
 

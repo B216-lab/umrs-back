@@ -11,11 +11,11 @@
     },
     "postCreateCommand": "./gradlew --no-daemon --version",
     "forwardPorts": [
-        8080,
+        8081,
         32779
     ],
     "portsAttributes": {
-        "8080": {
+        "8081": {
             "label": "Spring Boot"
         },
         "32779": {
@@ -31,7 +31,9 @@
             "settings": {
                 "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
                 "java.format.settings.profile": "GoogleStyle",
-                "java.import.gradle.wrapper.enabled": true
+                "java.import.gradle.wrapper.enabled": true,
+                "java.compile.nullAnalysis.mode": "automatic",
+                "java.jdt.ls.java.home": "/usr/lib/jvm/msopenjdk-current/"
             },
             "extensions": [
                 "vscjava.vscode-java-debug",

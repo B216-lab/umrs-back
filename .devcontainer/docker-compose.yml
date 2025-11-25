@@ -8,12 +8,14 @@ services:
         volumes:
             - ..:/workspace:cached
             - gradle-cache:/home/vscode/.gradle
-        command: sleep infinity
+        command: >
+            bash -lc "chown -R vscode:vscode /home/vscode/.gradle && exec sleep infinity"
         working_dir: /workspace
         environment:
             - LOGGING_FILE_PATH=/workspace/logs
+            - SERVER_PORT=8081
         ports:
-            - '8080:8080'
+            - '8081:8081'
         depends_on:
             - postgres
         networks:

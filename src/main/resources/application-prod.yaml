@@ -1,4 +1,7 @@
 ###################################### production environment properties
+server:
+    port: ${SERVER_PORT:8081}
+
 spring:
     application.name: umrs-backend
     banner.location: banner.txt
