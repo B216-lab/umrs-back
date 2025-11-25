@@ -1,41 +1,48 @@
 {
-  "name": "UMRS Backend Dev",
-  "dockerComposeFile": [
-    "docker-compose.yml"
-  ],
-  "service": "app",
-  "workspaceFolder": "/workspace",
-  "shutdownAction": "stopCompose",
-  "containerEnv": {
-    "GRADLE_USER_HOME": "/home/vscode/.gradle"
-  },
-  "postCreateCommand": "./gradlew --no-daemon --version",
-  "forwardPorts": [8080, 32779],
-  "portsAttributes": {
-    "8080": {
-      "label": "Spring Boot"
+    "name": "UMRS Backend Dev",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "stopCompose",
+    "containerEnv": {
+        "GRADLE_USER_HOME": "/home/vscode/.gradle"
     },
-    "32779": {
-      "label": "PostgreSQL"
-    }
-  },
-  "customizations": {
-    "vscode": {
-      "settings": {
-        "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
-        "java.format.settings.profile": "GoogleStyle",
-        "java.import.gradle.wrapper.enabled": true
-      },
-      "extensions": [
-        "vscjava.vscode-java-debug",
-        "redhat.java",
-        "vscjava.vscode-spring-boot-dashboard",
-        "vmware.vscode-spring-boot",
-        "richardwillis.vscode-gradle",
-        "redhat.vscode-yaml"
-      ]
-    }
-  },
-  "remoteUser": "vscode"
+    "postCreateCommand": "./gradlew --no-daemon --version",
+    "forwardPorts": [
+        8080,
+        32779
+    ],
+    "portsAttributes": {
+        "8080": {
+            "label": "Spring Boot"
+        },
+        "32779": {
+            "label": "PostgreSQL"
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+                "java.format.settings.profile": "GoogleStyle",
+                "java.import.gradle.wrapper.enabled": true
+            },
+            "extensions": [
+                "vscjava.vscode-java-debug",
+                "redhat.java",
+                "vscjava.vscode-spring-boot-dashboard",
+                "vmware.vscode-spring-boot",
+                "richardwillis.vscode-gradle",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+    "remoteUser": "vscode"
 }
 
