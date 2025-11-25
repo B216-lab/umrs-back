@@ -1,5 +1,9 @@
 package com.b216.umrs.features.movement.domain;
 
+import com.b216.umrs.features.movement.model.VehicleType;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,10 +24,11 @@ public class VehicleTypeRef {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, unique = true, length = 128)
-    private String code;
+    @Column(name = "code", nullable = false, unique = true, length = 128)
+    @Enumerated(EnumType.STRING)
+    private VehicleType code;
 
     @Column(name = "description_ru", nullable = false, length = 512)
     private String descriptionRu;

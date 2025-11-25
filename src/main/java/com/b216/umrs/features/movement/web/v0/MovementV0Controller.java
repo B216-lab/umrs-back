@@ -1,19 +1,18 @@
 package com.b216.umrs.features.movement.web.v0;
 
 import com.b216.umrs.features.movement.domain.Movement;
-import com.b216.umrs.features.movement.domain.MovementTypeRef;
-import com.b216.umrs.features.movement.domain.PlaceTypeRef;
-import com.b216.umrs.features.movement.domain.VehicleTypeRef;
+import com.b216.umrs.features.movement.model.MovementType;
+import com.b216.umrs.features.movement.model.PlaceType;
+import com.b216.umrs.features.movement.model.VehicleType;
 import com.b216.umrs.features.movement.repository.MovementRepository;
+import com.b216.umrs.features.movement.repository.MovementTypeRefRepository;
+import com.b216.umrs.features.movement.repository.PlaceTypeRefRepository;
+import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
 import jakarta.validation.Valid;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,9 +24,20 @@ import java.util.UUID;
 public class MovementV0Controller {
 
     private final MovementRepository movementRepository;
+    private final MovementTypeRefRepository movementTypeRefRepository;
+    private final PlaceTypeRefRepository placeTypeRefRepository;
+    private final VehicleTypeRefRepository vehicleTypeRefRepository;
 
-    public MovementV0Controller(MovementRepository movementRepository) {
+    public MovementV0Controller(
+            MovementRepository movementRepository,
+            MovementTypeRefRepository movementTypeRefRepository,
+            PlaceTypeRefRepository placeTypeRefRepository,
+            VehicleTypeRefRepository vehicleTypeRefRepository
+    ) {
         this.movementRepository = movementRepository;
+        this.movementTypeRefRepository = movementTypeRefRepository;
+        this.placeTypeRefRepository = placeTypeRefRepository;
+        this.vehicleTypeRefRepository = vehicleTypeRefRepository;
     }
 
     @GetMapping("/{id}")
@@ -79,15 +89,15 @@ public class MovementV0Controller {
     private MovementDto toDto(Movement m) {
         MovementDto dto = new MovementDto();
         dto.setId(m.getUuid());
-        dto.setType(m.getType() != null ? m.getType().getCode() : null);
+        dto.setType(m.getType() != null && m.getType().getCode() != null ? m.getType().getCode().name() : null);
         dto.setDepartureTime(m.getDepartureTime());
         dto.setDestinationTime(m.getDestinationTime());
         dto.setDay(m.getDay());
         dto.setDeparturePlace(m.getDeparturePlace());
         dto.setDestinationPlace(m.getDestinationPlace());
-        dto.setDepartureType(m.getDepartureType() != null ? m.getDepartureType().getCode() : null);
-        dto.setDestinationType(m.getDestinationType() != null ? m.getDestinationType().getCode() : null);
-        dto.setVehicleType(m.getVehicleType() != null ? m.getVehicleType().getCode() : null);
+        dto.setDepartureType(m.getDepartureType() != null && m.getDepartureType().getCode() != null ? m.getDepartureType().getCode().name() : null);
+        dto.setDestinationType(m.getDestinationType() != null && m.getDestinationType().getCode() != null ? m.getDestinationType().getCode().name() : null);
+        dto.setVehicleType(m.getVehicleType() != null && m.getVehicleType().getCode() != null ? m.getVehicleType().getCode().name() : null);
         dto.setCost(m.getCost());
         dto.setWaitingTime(m.getWaitingTime());
         dto.setSeatsAmount(m.getSeatsAmount());
@@ -105,45 +115,61 @@ public class MovementV0Controller {
         target.setSeatsAmount(dto.getSeatsAmount());
 
         if (dto.getType() != null) {
-            MovementTypeRef ref = new MovementTypeRef();
-            ref.setCode(dto.getType());
-            target.setType(ref);
+            try {
+                MovementType enumValue = MovementType.valueOf(dto.getType());
+                movementTypeRefRepository.findByCode(enumValue)
+                    .ifPresentOrElse(
+                        target::setType,
+                        () -> {
+                            throw new IllegalArgumentException("MovementType not found: " + dto.getType());
+                        }
+                    );
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid MovementType: " + dto.getType(), e);
+            }
         }
         if (dto.getDepartureType() != null) {
-            PlaceTypeRef ref = new PlaceTypeRef();
-            ref.setCode(dto.getDepartureType());
-            target.setDepartureType(ref);
+            try {
+                PlaceType enumValue = PlaceType.valueOf(dto.getDepartureType());
+                placeTypeRefRepository.findByCode(enumValue)
+                    .ifPresentOrElse(
+                        target::setDepartureType,
+                        () -> {
+                            throw new IllegalArgumentException("PlaceType not found: " + dto.getDepartureType());
+                        }
+                    );
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid PlaceType: " + dto.getDepartureType(), e);
+            }
         }
         if (dto.getDestinationType() != null) {
-            PlaceTypeRef ref = new PlaceTypeRef();
-            ref.setCode(dto.getDestinationType());
-            target.setDestinationType(ref);
+            try {
+                PlaceType enumValue = PlaceType.valueOf(dto.getDestinationType());
+                placeTypeRefRepository.findByCode(enumValue)
+                    .ifPresentOrElse(
+                        target::setDestinationType,
+                        () -> {
+                            throw new IllegalArgumentException("PlaceType not found: " + dto.getDestinationType());
+                        }
+                    );
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid PlaceType: " + dto.getDestinationType(), e);
+            }
         }
         if (dto.getVehicleType() != null) {
-            VehicleTypeRef ref = new VehicleTypeRef();
-            ref.setCode(dto.getVehicleType());
-            target.setVehicleType(ref);
+            try {
+                VehicleType enumValue = VehicleType.valueOf(dto.getVehicleType());
+                vehicleTypeRefRepository.findByCode(enumValue)
+                    .ifPresentOrElse(
+                        target::setVehicleType,
+                        () -> {
+                            throw new IllegalArgumentException("VehicleType not found: " + dto.getVehicleType());
+                        }
+                    );
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid VehicleType: " + dto.getVehicleType(), e);
+            }
         }
         return target;
     }
-
-    @Getter
-    @Setter
-    public static class MovementDto {
-        private UUID id;
-        private String type;
-        private OffsetDateTime departureTime;
-        private OffsetDateTime destinationTime;
-        private LocalDate day;
-        private com.fasterxml.jackson.databind.JsonNode departurePlace;
-        private com.fasterxml.jackson.databind.JsonNode destinationPlace;
-        private String departureType;
-        private String destinationType;
-        private String vehicleType;
-        private java.math.BigDecimal cost;
-        private Integer waitingTime;
-        private Integer seatsAmount;
-    }
 }
-
-

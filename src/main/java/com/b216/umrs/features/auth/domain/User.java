@@ -1,5 +1,8 @@
 package com.b216.umrs.features.auth.domain;
 
+import com.b216.umrs.features.auth.model.Gender;
+import com.b216.umrs.infrastructure.persistence.JsonNodeStringConverter;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +27,21 @@ public class User {
     private Boolean enabled = true;
 
     private Boolean locked = false;
+
+    private Integer maxSalary;
+
+    private Integer minSalary;
+
+    @Column(columnDefinition = "jsonb")
+    @jakarta.persistence.Convert(converter = JsonNodeStringConverter.class)
+    private JsonNode homePlace;
+
+    private String homeReadablePlace;
+    
+    
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     private LocalDate lastLogin = LocalDate.now();
 
