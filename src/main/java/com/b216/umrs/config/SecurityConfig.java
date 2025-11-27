@@ -10,6 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Базовая конфигурация безопасности: отключать аутентификацию и разрешать доступ ко всем эндпоинтам.
@@ -21,7 +27,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(httpSecuritySessionManagementConfigurer -> {
                 httpSecuritySessionManagementConfigurer.maximumSessions(15)
                     .maxSessionsPreventsLogin(true)
                     .expiredUrl("/login?expired=true");
@@ -35,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/public/**").permitAll()
                 .requestMatchers("/api/v1/signup/**").permitAll()
                 .requestMatchers("/api/health").permitAll()
+                .requestMatchers("/api/v1/public/forms/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v0/movements/").permitAll()
                 .requestMatchers("/login").permitAll()
                 .anyRequest().authenticated()
@@ -54,6 +63,22 @@ public class SecurityConfig {
             .formLogin(form -> form.disable());
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Разрешает запросы с любых источников (для разработки)
+        // TODO В продакшене указать конкретные домены
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(false); // Должно быть false при allowedOrigins("*")
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

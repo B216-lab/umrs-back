@@ -23,11 +23,15 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
+    }
 }
 
 extra["snippetsDir"] = file("build/generated-snippets")
 
 dependencies {
+    implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.9.0")
     implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")

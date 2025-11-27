@@ -10,25 +10,5 @@
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         },
-        {
-            "type": "java",
-            "name": "Spring Boot-UmrsBackApplication<umrs-back>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.b216.umrs.UmrsBackApplication",
-            "projectName": "umrs-back",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
-            "name": "Spring Boot-UmrsBackApplication<umrs-back>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.b216.umrs.UmrsBackApplication",
-            "projectName": "umrs-back",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        }
     ]
 }
