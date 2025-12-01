@@ -5,6 +5,15 @@ server:
 spring:
     application.name: umrs-backend
     banner.location: banner.txt
+    mail:
+        host: ${MAIL_HOST:smtp.gmail.com}
+        port: ${MAIL_PORT:587}
+        username: ${MAIL_USERNAME:something@gmail.com}
+        password: ${MAIL_PASSWORD:some-password}
+        properties:
+            mail.smtp.auth: true
+            mail.smtp.starttls.enable: false
+            mail.smtp.starttls.required: false
     docker:
         compose:
             file: compose-dev.yaml

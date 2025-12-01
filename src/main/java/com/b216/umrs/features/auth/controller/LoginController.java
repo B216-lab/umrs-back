@@ -1,6 +1,8 @@
 package com.b216.umrs.features.auth.controller;
 
 import com.b216.umrs.features.auth.dto.LoginRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,7 +11,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -29,6 +33,11 @@ public class LoginController {
     public LoginController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
+    
+    @GetMapping("/token/one-time")
+    public String sendOneTimeToken() {
+        return "token-one-time";
+    }
 
     /**
      * Выполняет вход пользователя и создаёт HTTP-сессию.
@@ -37,7 +46,10 @@ public class LoginController {
      * @return ResponseEntity с информацией об успешном входе
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, Object>> login(
+        @Valid @RequestBody LoginRequest request,
+        HttpServletRequest httpRequest
+    ) {
         try {
             // Создание токена аутентификации
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -48,8 +60,18 @@ public class LoginController {
             // Аутентификация через AuthenticationManager
             Authentication authentication = authenticationManager.authenticate(authToken);
 
-            // Сохранение аутентификации в SecurityContext (и в сессии)
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Создаёт новый SecurityContext и сохраняет его как в текущий поток, так и в HTTP-сессию
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            // Явно создаёт/получает HTTP-сессию и сохраняет в неё SecurityContext,
+            // чтобы сессия сохранялась между перезагрузками страницы
+            HttpSession session = httpRequest.getSession(true);
+            session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                securityContext
+            );
 
             log.info("User {} successfully authenticated", request.email());
 

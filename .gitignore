@@ -41,3 +41,11 @@ out/
 
 logs
 legacy_forms_db_migration/road-survey_*.dump
+src/main/resources/application-prod.yaml
+src/main/resources/application-dev-mail.yaml
+
+# Environment variables
+.env.local
+.env.*.local
+.env
+**/.env

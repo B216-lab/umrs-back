@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * V1 контроллер для CRUD операций с Movement с упрощённой моделью DTO.
@@ -29,10 +28,10 @@ public class MovementV0Controller {
     private final VehicleTypeRefRepository vehicleTypeRefRepository;
 
     public MovementV0Controller(
-            MovementRepository movementRepository,
-            MovementTypeRefRepository movementTypeRefRepository,
-            PlaceTypeRefRepository placeTypeRefRepository,
-            VehicleTypeRefRepository vehicleTypeRefRepository
+        MovementRepository movementRepository,
+        MovementTypeRefRepository movementTypeRefRepository,
+        PlaceTypeRefRepository placeTypeRefRepository,
+        VehicleTypeRefRepository vehicleTypeRefRepository
     ) {
         this.movementRepository = movementRepository;
         this.movementTypeRefRepository = movementTypeRefRepository;
@@ -41,7 +40,7 @@ public class MovementV0Controller {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MovementDto> getById(@PathVariable("id") UUID id) {
+    public ResponseEntity<MovementDto> getById(@PathVariable("id") Long id) {
         Optional<Movement> found = movementRepository.findById(id);
         return found.map(m -> ResponseEntity.ok(toDto(m)))
             .orElseGet(() -> ResponseEntity.notFound().build());
@@ -68,7 +67,7 @@ public class MovementV0Controller {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MovementDto> update(@PathVariable("id") UUID id, @Valid @RequestBody MovementDto dto) {
+    public ResponseEntity<MovementDto> update(@PathVariable("id") Long id, @Valid @RequestBody MovementDto dto) {
         return movementRepository.findById(id)
             .map(existing -> {
                 Movement updated = movementRepository.save(fromDto(dto, existing));
@@ -78,7 +77,7 @@ public class MovementV0Controller {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         if (!movementRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -88,7 +87,7 @@ public class MovementV0Controller {
 
     private MovementDto toDto(Movement m) {
         MovementDto dto = new MovementDto();
-        dto.setId(m.getUuid());
+        dto.setId(m.getId());
         dto.setType(m.getType() != null && m.getType().getCode() != null ? m.getType().getCode().name() : null);
         dto.setDepartureTime(m.getDepartureTime());
         dto.setDestinationTime(m.getDestinationTime());

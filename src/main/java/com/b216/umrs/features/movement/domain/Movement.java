@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 
 @Entity
@@ -20,7 +19,7 @@ public class Movement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID uuid;
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "movement_type_id", nullable = false)

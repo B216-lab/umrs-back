@@ -1,12 +1,16 @@
 package com.b216.umrs.config;
 
 import com.b216.umrs.features.auth.model.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
+import org.springframework.security.authentication.ott.OneTimeTokenService;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +30,15 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+    @Bean
+    public OneTimeTokenService oneTimeTokenService() {
+        return new JdbcOneTimeTokenService(jdbcTemplate);
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -63,9 +76,13 @@ public class SecurityConfig {
             .exceptionHandling(exceptionHandlingConfigurer -> {
                 exceptionHandlingConfigurer.accessDeniedPage("/access-denied");
             })
-            .httpBasic(basic -> {
-            })
-            .formLogin(AbstractHttpConfigurer::disable);
+            .httpBasic(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .oneTimeTokenLogin(ott ->
+                ott.tokenGeneratingUrl("/api/v1/auth/ott")
+                    .defaultSubmitPageUrl("/api/v1/auth/submit-ott")
+                    .showDefaultSubmitPage(false)
+            );
 
         return http.build();
     }
