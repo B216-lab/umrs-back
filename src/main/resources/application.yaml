@@ -1,19 +1,18 @@
 ###################################### dev environment properties
-server:
-    port: ${SERVER_PORT:8081}
-
 spring:
+    config.import: file:.env[.properties]
     application.name: umrs-backend
     banner.location: banner.txt
     mail:
-        host: ${MAIL_HOST:smtp.gmail.com}
+        host: ${MAIL_HOST:smtp.yandex.ru}
         port: ${MAIL_PORT:587}
-        username: ${MAIL_USERNAME:something@gmail.com}
+        username: ${MAIL_USERNAME:something@yandex.ru}
         password: ${MAIL_PASSWORD:some-password}
         properties:
             mail.smtp.auth: true
-            mail.smtp.starttls.enable: false
-            mail.smtp.starttls.required: false
+            mail.smtp.starttls.enable: true
+            mail.smtp.starttls.required: true
+            mail.smtp.ssl.trust: smtp.yandex.ru
     docker:
         compose:
             file: compose-dev.yaml
@@ -32,6 +31,10 @@ spring:
     # Spring Data REST base path for rest repositories
     data.rest.base-path: /api/v1
     threads.virtual.enabled: true
+
+server:
+    port: ${SERVER_PORT:8081}
+
 logging:
     level:
         # root: DEBUG
@@ -40,5 +43,6 @@ logging:
         org.hibernate.type.descriptor.sql: trace
         org.springframework.security: DEBUG
     file.path: logs/myapp.log
+
 springdoc:
     api-docs.path: /docs

@@ -16,6 +16,6 @@ public interface CustomOneTimeTokenRepository extends JpaRepository<CustomOneTim
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM one_time_tokens e WHERE e.expiresAt < :currentTimestamp")
+    @Query("DELETE FROM CustomOneTimeToken e WHERE e.expiresAt < :currentTimestamp")
     int deleteExpiredTokens(Instant currentTimestamp);
 }

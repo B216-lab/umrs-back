@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.ott.OneTimeToken;
@@ -20,6 +21,9 @@ public class EmailMagicLinkHandler implements OneTimeTokenGenerationSuccessHandl
     @Autowired
     private JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+    private String fromAddress;
+
     private final OneTimeTokenGenerationSuccessHandler redirectHandler =
         new RedirectOneTimeTokenGenerationSuccessHandler("/ott/check-email");
 
@@ -35,7 +39,8 @@ public class EmailMagicLinkHandler implements OneTimeTokenGenerationSuccessHandl
             .toUriString();
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(token.getUsername());
+        message.setFrom(fromAddress);
+        message.setTo(token.getUsername().trim());
         message.setSubject("Your Sign-in Link");
         message.setText("Click here to sign in: " + magicLink);
 
