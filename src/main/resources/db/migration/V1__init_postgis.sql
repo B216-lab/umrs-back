@@ -229,7 +229,11 @@ CREATE TABLE IF NOT EXISTS users
     min_salary          INTEGER,
     home_place          JSONB,
     home_readable_place VARCHAR(255),
+    transportation_cost_min INTEGER,
+    transportation_cost_max INTEGER,
+    birthday            DATE,
     gender              VARCHAR(10),
+    social_status_id    BIGINT REFERENCES social_statuses (id),
     last_login          DATE    DEFAULT CURRENT_DATE,
     creation_date       DATE    DEFAULT CURRENT_DATE
 );
@@ -281,15 +285,16 @@ VALUES (201, 'READ'),
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert test users with explicit long integer ids
-INSERT INTO users (id, username, password, enabled, gender, min_salary, max_salary, home_readable_place, home_place)
+INSERT INTO users (id, username, password, enabled, gender, birthday, min_salary, max_salary, transportation_cost_min,
+                   transportation_cost_max, social_status_id, home_readable_place, home_place)
 VALUES (1001, 'test_employee@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', NULL, NULL, NULL, NULL),   -- password: qwerty
+        'MALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),   -- password: qwerty
        (1002, 'test_manager@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'FEMALE', NULL, NULL, NULL, NULL), -- password: qwerty
+        'FEMALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL), -- password: qwerty
        (1003, 'power_admin@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', NULL, NULL, NULL, NULL),    -- password: qwerty
+        'MALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),    -- password: qwerty
        (1004, 'test_user_with_address@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', 35000, 65000, 'г Москва, ул Хабаровская, д 6',
+        'MALE', '1990-05-15', 35000, 65000, 0, 3000, 1, 'г Москва, ул Хабаровская, д 6',
         '{
             "type": "Point",
             "coordinates": [

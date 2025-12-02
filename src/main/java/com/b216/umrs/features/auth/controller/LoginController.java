@@ -134,10 +134,16 @@ public class LoginController {
         userRepository.findByUsername(authentication.getName())
             .ifPresent(user -> {
                 response.put("gender", user.getGender());
+                response.put("birthday", user.getBirthday());
                 response.put("minSalary", user.getMinSalary());
                 response.put("maxSalary", user.getMaxSalary());
+                response.put("transportationCostMin", user.getTransportationCostMin());
+                response.put("transportationCostMax", user.getTransportationCostMax());
                 response.put("homeReadablePlace", user.getHomeReadablePlace());
                 response.put("homePlace", user.getHomePlace());
+                if (user.getSocialStatus() != null) {
+                    response.put("socialStatus", user.getSocialStatus().getCode());
+                }
             });
 
         return ResponseEntity.ok(response);
