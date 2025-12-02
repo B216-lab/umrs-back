@@ -4,15 +4,15 @@ spring:
     application.name: umrs-backend
     banner.location: banner.txt
     mail:
-        host: ${MAIL_HOST:smtp.yandex.ru}
-        port: ${MAIL_PORT:587}
-        username: ${MAIL_USERNAME:something@yandex.ru}
+        host: ${MAIL_HOST:localhost}
+        port: ${MAIL_PORT:1025}
+        username: ${MAIL_USERNAME:app@umrs.ru}
         password: ${MAIL_PASSWORD:some-password}
         properties:
-            mail.smtp.auth: true
-            mail.smtp.starttls.enable: true
-            mail.smtp.starttls.required: true
-            mail.smtp.ssl.trust: smtp.yandex.ru
+            mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+            mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:false}
+            mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED:false}
+            mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST:localhost}
     docker:
         compose:
             file: compose-dev.yaml
