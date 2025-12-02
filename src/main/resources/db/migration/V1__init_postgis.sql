@@ -281,20 +281,30 @@ VALUES (201, 'READ'),
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert test users with explicit long integer ids
-INSERT INTO users (id, username, password, enabled, gender)
+INSERT INTO users (id, username, password, enabled, gender, min_salary, max_salary, home_readable_place, home_place)
 VALUES (1001, 'test_employee@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE'),   -- password: qwerty
+        'MALE', NULL, NULL, NULL, NULL),   -- password: qwerty
        (1002, 'test_manager@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'FEMALE'), -- password: qwerty
+        'FEMALE', NULL, NULL, NULL, NULL), -- password: qwerty
        (1003, 'power_admin@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE')    -- password: qwerty
+        'MALE', NULL, NULL, NULL, NULL),    -- password: qwerty
+       (1004, 'test_user_with_address@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
+        'MALE', 35000, 65000, 'г Москва, ул Хабаровская, д 6',
+        '{
+            "type": "Point",
+            "coordinates": [
+                37.8261683,
+                55.8210899
+            ]
+        }'::jsonb)  -- password: qwerty
 ON CONFLICT (id) DO NOTHING;
 
 -- Assign roles to users (using explicit long integer ids)
 INSERT INTO users_roles (user_id, role_id)
 VALUES (1001, 103), -- test_employee@local.dev => USER
        (1002, 102), -- test_manager@local.dev => MANAGER
-       (1003, 101)  -- power_admin@local.dev => ADMIN
+       (1003, 101), -- power_admin@local.dev => ADMIN
+       (1004, 103)  -- test_user_with_address@local.dev => USER
 ON CONFLICT DO NOTHING;
 
 -- Assign scopes to users (using explicit long integer ids)
@@ -305,7 +315,8 @@ VALUES (1001, 201), -- test_employee@local.dev => READ
        (1003, 201), -- power_admin@local.dev => READ
        (1003, 202), -- power_admin@local.dev => WRITE
        (1003, 203), -- power_admin@local.dev => UPDATE
-       (1003, 204)  -- power_admin@local.dev => DELETE
+       (1003, 204), -- power_admin@local.dev => DELETE
+       (1004, 201)  -- test_user_with_address@local.dev => READ
 ON CONFLICT DO NOTHING;
 
 -- Example assignment of scopes directly to roles via role_scopes table

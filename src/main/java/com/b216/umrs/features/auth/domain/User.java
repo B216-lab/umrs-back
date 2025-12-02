@@ -37,8 +37,8 @@ public class User {
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode homePlace;
 
+    // NOTE для минимизации количества запросов к DaData, вместо обратного геокодирования по координатам хранится читаемый адрес
     private String homeReadablePlace;
-    
     
 
     @Enumerated(EnumType.STRING)

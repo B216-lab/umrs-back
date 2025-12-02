@@ -130,6 +130,16 @@ public class LoginController {
             .map(auth -> auth.getAuthority())
             .toList());
 
+        // Добавляет профиль пользователя, если он существует
+        userRepository.findByUsername(authentication.getName())
+            .ifPresent(user -> {
+                response.put("gender", user.getGender());
+                response.put("minSalary", user.getMinSalary());
+                response.put("maxSalary", user.getMaxSalary());
+                response.put("homeReadablePlace", user.getHomeReadablePlace());
+                response.put("homePlace", user.getHomePlace());
+            });
+
         return ResponseEntity.ok(response);
     }
 

@@ -41,6 +41,8 @@ public class Movement {
     @Column(columnDefinition = "jsonb")
     @jakarta.persistence.Convert(converter = JsonNodeStringConverter.class)
     private JsonNode destinationPlace;
+    
+    // TODO add readable addresses for departure and destination places
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "departure_place_type_id", nullable = false)
