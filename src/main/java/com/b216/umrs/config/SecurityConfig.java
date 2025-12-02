@@ -56,7 +56,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/me").authenticated()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/public/forms/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v0/movements/").permitAll()
                 .anyRequest().authenticated()
             )
             .logout(logoutConfigurer -> {
