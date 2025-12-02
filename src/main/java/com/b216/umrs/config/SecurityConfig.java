@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -41,7 +42,13 @@ public class SecurityConfig {
                 httpSecuritySessionManagementConfigurer.maximumSessions(15)
                     .maxSessionsPreventsLogin(true)
             )
-            .csrf(csrf -> csrf.disable()) // TODO enable and configure
+            .csrf(csrf -> csrf
+                // Use cookie-based CSRF tokens that are readable from JavaScript (for SPA clients)
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                // Public forms endpoints are consumed without CSRF tokens (e.g. embedded Vueform),
+                // so CSRF protection is not applied there
+                .ignoringRequestMatchers("/api/v1/public/forms/**")
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
                 .requestMatchers("/api/v1/manager/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
@@ -54,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/ott").permitAll()
                 .requestMatchers("/api/v1/auth/submit-ott").permitAll()
                 .requestMatchers("/api/v1/auth/me").authenticated()
+                .requestMatchers("/api/v1/auth/csrf").permitAll()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/public/forms/**").permitAll()
                 .anyRequest().authenticated()
