@@ -19,12 +19,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -47,7 +53,6 @@ public class SecurityConfig {
             .sessionManagement(httpSecuritySessionManagementConfigurer ->
                 httpSecuritySessionManagementConfigurer.maximumSessions(15)
                     .maxSessionsPreventsLogin(true)
-                    .expiredUrl("/login?expired=true")
             )
             .csrf(csrf -> csrf.disable()) // TODO enable and configure
             .authorizeHttpRequests(auth -> auth
@@ -63,7 +68,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/public/forms/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v0/movements/").permitAll()
-                .requestMatchers("/login").permitAll()
                 .anyRequest().authenticated()
             )
             .logout(logoutConfigurer -> {
@@ -74,7 +78,9 @@ public class SecurityConfig {
                 anonymousConfigurer.principal("anonymous");
             })
             .exceptionHandling(exceptionHandlingConfigurer -> {
-                exceptionHandlingConfigurer.accessDeniedPage("/access-denied");
+                exceptionHandlingConfigurer
+                    .authenticationEntryPoint(authenticationEntryPoint())
+                    .accessDeniedHandler(accessDeniedHandler());
             })
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
@@ -122,6 +128,40 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder);
 
         return new ProviderManager(authenticationProvider);
+    }
+
+    /**
+     * Returns 401 Unauthorized response body with error message when authentication is required.
+     * @return
+     */
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return (request, response, authException) -> {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", "Unauthorized");
+            body.put("message", authException.getMessage());
+            body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+            new ObjectMapper().writeValue(response.getOutputStream(), body);
+        };
+    }
+
+    /**
+     * Returns 403 Forbidden response body with error message when access is denied.
+     * @return
+     */
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json;charset=UTF-8");
+            Map<String, Object> body = new HashMap<>();
+            body.put("error", "Forbidden");
+            body.put("message", accessDeniedException.getMessage());
+            body.put("status", HttpServletResponse.SC_FORBIDDEN);
+            new ObjectMapper().writeValue(response.getOutputStream(), body);
+        };
     }
 }
 
