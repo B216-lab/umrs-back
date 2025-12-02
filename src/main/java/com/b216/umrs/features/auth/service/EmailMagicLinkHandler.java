@@ -30,19 +30,11 @@ public class EmailMagicLinkHandler implements OneTimeTokenGenerationSuccessHandl
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        OneTimeToken token) throws IOException, ServletException {
-        String magicLink = UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
-            .replacePath(request.getContextPath())
-            .replaceQuery(null)
-            .fragment(null)
-            .path("/api/v1/auth/ott")
-            .queryParam("token", token.getTokenValue())
-            .toUriString();
-
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromAddress);
         message.setTo(token.getUsername().trim());
-        message.setSubject("Your Sign-in Link");
-        message.setText("Click here to sign in: " + magicLink);
+        message.setSubject("Your one-time login code");
+        message.setText("Your one-time login token: " + token.getTokenValue());
 
         mailSender.send(message);
         redirectHandler.handle(request, response, token);

@@ -1,16 +1,12 @@
 package com.b216.umrs.config;
 
 import com.b216.umrs.features.auth.model.Role;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
-import org.springframework.security.authentication.ott.OneTimeTokenService;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,15 +33,6 @@ import java.util.Map;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    @Bean
-    public OneTimeTokenService oneTimeTokenService() {
-        return new JdbcOneTimeTokenService(jdbcTemplate);
-    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -64,6 +51,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/signup/**").permitAll()
                 .requestMatchers("/api/v1/auth/login").permitAll()
                 .requestMatchers("/api/v1/auth/logout").permitAll()
+                .requestMatchers("/api/v1/auth/ott").permitAll()
+                .requestMatchers("/api/v1/auth/submit-ott").permitAll()
                 .requestMatchers("/api/v1/auth/me").authenticated()
                 .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/public/forms/**").permitAll()
@@ -83,12 +72,7 @@ public class SecurityConfig {
                     .accessDeniedHandler(accessDeniedHandler());
             })
             .httpBasic(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .oneTimeTokenLogin(ott ->
-                ott.tokenGeneratingUrl("/api/v1/auth/ott")
-                    .defaultSubmitPageUrl("/api/v1/auth/submit-ott")
-                    .showDefaultSubmitPage(false)
-            );
+            .formLogin(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
