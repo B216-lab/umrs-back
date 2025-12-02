@@ -1,6 +1,7 @@
 package com.b216.umrs.features.auth.controller;
 
 import com.b216.umrs.features.auth.dto.LoginRequest;
+import com.b216.umrs.features.auth.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,9 +31,14 @@ import java.util.Map;
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
 
-    public LoginController(AuthenticationManager authenticationManager) {
+    public LoginController(
+        AuthenticationManager authenticationManager,
+        UserRepository userRepository
+    ) {
         this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
     }
     
     @GetMapping("/token/one-time")
@@ -72,6 +79,13 @@ public class LoginController {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 securityContext
             );
+
+            // Обновляет дату последнего входа пользователя
+            userRepository.findByUsername(authentication.getName())
+                .ifPresent(user -> {
+                    user.setLastLogin(LocalDate.now());
+                    userRepository.save(user);
+                });
 
             log.info("User {} successfully authenticated", request.email());
 

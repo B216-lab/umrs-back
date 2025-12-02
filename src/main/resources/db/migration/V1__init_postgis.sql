@@ -221,15 +221,15 @@ CREATE TABLE IF NOT EXISTS scopes
 CREATE TABLE IF NOT EXISTS users
 (
     id                  BIGSERIAL PRIMARY KEY,
-    username            VARCHAR(255) NOT NULL,
-    password            VARCHAR(255) NOT NULL,
+    username            VARCHAR(255) NOT NULL UNIQUE,
+    password            VARCHAR(255),
     enabled             BOOLEAN DEFAULT true,
     locked              BOOLEAN DEFAULT false,
     max_salary          INTEGER,
     min_salary          INTEGER,
     home_place          JSONB,
     home_readable_place VARCHAR(255),
-    gender              VARCHAR(10)  NOT NULL,
+    gender              VARCHAR(10),
     last_login          DATE    DEFAULT CURRENT_DATE,
     creation_date       DATE    DEFAULT CURRENT_DATE
 );

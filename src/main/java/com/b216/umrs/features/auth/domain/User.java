@@ -1,11 +1,12 @@
 package com.b216.umrs.features.auth.domain;
 
 import com.b216.umrs.features.auth.model.Gender;
-import com.b216.umrs.infrastructure.persistence.JsonNodeStringConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,7 +34,7 @@ public class User {
     private Integer minSalary;
 
     @Column(columnDefinition = "jsonb")
-    @jakarta.persistence.Convert(converter = JsonNodeStringConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode homePlace;
 
     private String homeReadablePlace;

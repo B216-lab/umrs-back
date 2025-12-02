@@ -1,6 +1,10 @@
 package com.b216.umrs.features.auth.controller;
 
 import com.b216.umrs.features.auth.domain.CustomOneTimeToken;
+import com.b216.umrs.features.auth.domain.Role;
+import com.b216.umrs.features.auth.domain.User;
+import com.b216.umrs.features.auth.repository.RoleRepository;
+import com.b216.umrs.features.auth.repository.UserRepository;
 import com.b216.umrs.features.auth.service.CustomOneTimeTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -12,6 +16,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,29 +24,60 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 public class OneTimeTokenAuthController {
 
+    /**
+     * DTO-запрос для генерации одноразового токена по email.
+     *
+     * :param email: email пользователя
+     */
     public record OneTimeTokenRequest(String email) {
     }
 
+    /**
+     * DTO-ответ с одноразовым токеном и временем его истечения.
+     *
+     * :param token: строковое значение одноразового токена
+     * :param expiresAt: момент времени, когда токен истекает
+     */
     public record OneTimeTokenResponse(String token, Instant expiresAt) {
     }
 
+    /**
+     * DTO-запрос для входа по одноразовому токену.
+     *
+     * :param token: строковое значение одноразового токена
+     */
     public record OneTimeTokenLoginRequest(String token) {
     }
 
     private final CustomOneTimeTokenService oneTimeTokenService;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public OneTimeTokenAuthController(CustomOneTimeTokenService oneTimeTokenService,
-                                      UserDetailsService userDetailsService) {
+    public OneTimeTokenAuthController(
+        CustomOneTimeTokenService oneTimeTokenService,
+        UserDetailsService userDetailsService,
+        UserRepository userRepository,
+        RoleRepository roleRepository,
+        PasswordEncoder passwordEncoder
+    ) {
         this.oneTimeTokenService = oneTimeTokenService;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/ott")
@@ -63,7 +99,17 @@ public class OneTimeTokenAuthController {
                 .body(Map.of("error", "Invalid or expired token"));
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUsername());
+        String username = token.getUsername();
+
+        // Создать пользователя, если email ранее не зарегистрирован
+        User user = userRepository.findByUsername(username)
+            .orElseGet(() -> createUserForEmail(username));
+
+        // Обновляет дату последнего входа пользователя
+        user.setLastLogin(LocalDate.now());
+        userRepository.save(user);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
             userDetails,
@@ -90,7 +136,30 @@ public class OneTimeTokenAuthController {
 
         return ResponseEntity.ok(response);
     }
-}
 
+    /**
+     * Создать нового пользователя по email и назначить роль USER.
+     *
+     * :param email: email пользователя
+     * :return: созданный пользователь
+     */
+    private User createUserForEmail(String email) {
+        Role userRole = roleRepository.findByName(com.b216.umrs.features.auth.model.Role.USER)
+            .orElseThrow(() -> new IllegalStateException("Default USER role not found in database"));
+
+        User newUser = new User();
+        newUser.setUsername(email);
+        // Генерировать случайный пароль, так как вход выполняется по одноразовому токену
+        String randomPassword = UUID.randomUUID().toString();
+        newUser.setPassword(passwordEncoder.encode(randomPassword));
+
+        List<Role> roles = new ArrayList<>();
+        roles.add(userRole);
+        newUser.setRoles(roles);
+        newUser.setScopes(new ArrayList<>());
+
+        return userRepository.save(newUser);
+    }
+}
 
 
