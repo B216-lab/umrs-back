@@ -5,12 +5,7 @@
 ![Postgres Version](https://img.shields.io/badge/PostgreSQL-18.3.6-blue.svg)
 ![Gradle version](https://img.shields.io/badge/Gradle-18.3.6-orange.svg)
 
-## New API
+## Docs
 
 - `http://localhost:8081/redoc-v1.html` - [Redoc](https://redocly.com/redoc)
 - `http://localhost:8081/docs/v1` - [Open API](https://swagger.io/specification/) JSON
-
-## Legacy API (will be removed eventually)
-
-- `http://localhost:8081/redoc-v0.html` - [Redoc](https://redocly.com/redoc)
-- `http://localhost:8081/docs/v0` - [Open API](https://swagger.io/specification/) JSON
