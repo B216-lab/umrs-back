@@ -10,9 +10,11 @@ services:
             bash -lc "chown -R vscode:vscode /home/vscode/.gradle && exec sleep infinity"
         working_dir: /workspace
         environment:
-            - GRADLE_USER_HOME=/home/vscode/.gradle
-            - LOGGING_FILE_PATH=/workspace/logs
-            - SERVER_PORT=8081
+            - 'MAIL_HOST=mailpit'
+            - 'SPRING_DOCKER_COMPOSE_ENABLED=false'
+            - 'GRADLE_USER_HOME=/home/vscode/.gradle'
+            - 'LOGGING_FILE_PATH=/workspace/logs'
+            - 'SERVER_PORT=8081'
             - 'SPRING_PROFILES_ACTIVE=dev'
             - 'SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase'
             - 'SPRING_DATASOURCE_USERNAME=myuser'
