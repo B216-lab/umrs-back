@@ -2,17 +2,23 @@ services:
     mailpit:
         image: axllent/mailpit:v1.28
         container_name: mailpit
-        # restart: unless-stopped
         volumes:
             - ./mailpit-data:/data
         ports:
+            # http
             - "8025:8025"
+            # smtp
             - "1025:1025"
         environment:
             MP_MAX_MESSAGES: 5000
             MP_DATABASE: /data/mailpit.db
             MP_SMTP_AUTH_ACCEPT_ANY: 1
             MP_SMTP_AUTH_ALLOW_INSECURE: 1
+        healthcheck:
+            test: ["CMD", "curl", "--silent", "--fail-with-body", "--max-time", "5", "http://localhost:8025/readyz"]
+            interval: 15s
+            timeout: 5s
+            retries: 2
 
     postgres:
         image: 'postgis/postgis:18-3.6-alpine'

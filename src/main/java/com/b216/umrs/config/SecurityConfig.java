@@ -62,7 +62,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/submit-ott").permitAll()
                 .requestMatchers("/api/v1/auth/me").authenticated()
                 .requestMatchers("/api/v1/auth/csrf").permitAll()
-                .requestMatchers("/api/health").permitAll()
                 .requestMatchers("/api/v1/public/forms/**").permitAll()
                 .anyRequest().authenticated()
             )

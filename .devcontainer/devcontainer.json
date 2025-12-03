@@ -1,14 +1,12 @@
 {
     "name": "UMRS Backend Dev",
     "dockerComposeFile": [
+        "../compose-dev.yaml",
         "docker-compose.yml"
     ],
     "service": "app",
-    "workspaceFolder": "/workspace",
+    "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
     "shutdownAction": "stopCompose",
-    "containerEnv": {
-        "GRADLE_USER_HOME": "/home/vscode/.gradle"
-    },
     "postCreateCommand": "./gradlew --no-daemon --version",
     "forwardPorts": [
         8081,
@@ -22,18 +20,14 @@
             "label": "PostgreSQL"
         }
     },
-    "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-        "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {}
-    },
+    "remoteUser": "vscode",
     "customizations": {
         "vscode": {
             "settings": {
-                "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
-                "java.format.settings.profile": "GoogleStyle",
                 "java.import.gradle.wrapper.enabled": true,
                 "java.compile.nullAnalysis.mode": "automatic",
-                "java.jdt.ls.java.home": "/usr/lib/jvm/msopenjdk-current/"
+                "java.jdt.ls.java.home": "/usr/lib/jvm/msopenjdk-current/",
+                "editor.formatOnSave": true
             },
             "extensions": [
                 "vscjava.vscode-java-debug",
@@ -44,7 +38,5 @@
                 "redhat.vscode-yaml"
             ]
         }
-    },
-    "remoteUser": "vscode"
+    }
 }
-
