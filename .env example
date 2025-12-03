@@ -1,0 +1,11 @@
+MAIL_HOST=smtp.gmail.ru
+MAIL_PORT=587
+MAIL_USERNAME=kirill.zhilenckov@gmail.com
+MAIL_PASSWORD=some-password
+MAIL_SMTP_AUTH=true
+MAIL_SMTP_STARTTLS_ENABLE=true
+MAIL_SMTP_STARTTLS_REQUIRED=true
+MAIL_SMTP_SSL_TRUST=smtp.gmail.ru
+
+APP_ADMIN_USERNAME=admin@umrs.ru
+APP_ADMIN_PASSWORD=Admin123!

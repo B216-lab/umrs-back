@@ -46,3 +46,8 @@ logging:
 
 springdoc:
     api-docs.path: /docs
+
+app:
+  admin:
+    username: ${APP_ADMIN_USERNAME:}
+    password: ${APP_ADMIN_PASSWORD:}
