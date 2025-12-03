@@ -220,22 +220,22 @@ CREATE TABLE IF NOT EXISTS scopes
 -- Table for users
 CREATE TABLE IF NOT EXISTS users
 (
-    id                  BIGSERIAL PRIMARY KEY,
-    username            VARCHAR(255) NOT NULL UNIQUE,
-    password            VARCHAR(255),
-    enabled             BOOLEAN DEFAULT true,
-    locked              BOOLEAN DEFAULT false,
-    max_salary          INTEGER,
-    min_salary          INTEGER,
-    home_place          JSONB,
-    home_readable_place VARCHAR(255),
+    id                      BIGSERIAL PRIMARY KEY,
+    username                VARCHAR(255) NOT NULL UNIQUE,
+    password                VARCHAR(255),
+    enabled                 BOOLEAN DEFAULT true,
+    locked                  BOOLEAN DEFAULT false,
+    max_salary              INTEGER,
+    min_salary              INTEGER,
+    home_place              JSONB,
+    home_readable_place     VARCHAR(255),
     transportation_cost_min INTEGER,
     transportation_cost_max INTEGER,
-    birthday            DATE,
-    gender              VARCHAR(10),
-    social_status_id    BIGINT REFERENCES social_statuses (id),
-    last_login          DATE    DEFAULT CURRENT_DATE,
-    creation_date       DATE    DEFAULT CURRENT_DATE
+    birthday                DATE,
+    gender                  VARCHAR(10),
+    social_status_id        BIGINT REFERENCES social_statuses (id),
+    last_login              DATE    DEFAULT CURRENT_DATE,
+    creation_date           DATE    DEFAULT CURRENT_DATE
 );
 
 -- Association table: users_roles (Many-to-Many between users and roles)
@@ -283,46 +283,6 @@ VALUES (201, 'READ'),
        (203, 'UPDATE'),
        (204, 'DELETE')
 ON CONFLICT (id) DO NOTHING;
-
--- Insert test users with explicit long integer ids
-INSERT INTO users (id, username, password, enabled, gender, birthday, min_salary, max_salary, transportation_cost_min,
-                   transportation_cost_max, social_status_id, home_readable_place, home_place)
-VALUES (1001, 'test_employee@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),   -- password: qwerty
-       (1002, 'test_manager@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'FEMALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL), -- password: qwerty
-       (1003, 'power_admin@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),    -- password: qwerty
-       (1004, 'test_user_with_address@local.dev', '$2a$10$kEQxusWgs1ncnA.f.IuedeZlvtCNSu4zVT3XovHFFmPWRcaYwrlzu', true,
-        'MALE', '1990-05-15', 35000, 65000, 0, 3000, 1, 'г Москва, ул Хабаровская, д 6',
-        '{
-            "type": "Point",
-            "coordinates": [
-                37.8261683,
-                55.8210899
-            ]
-        }'::jsonb)  -- password: qwerty
-ON CONFLICT (id) DO NOTHING;
-
--- Assign roles to users (using explicit long integer ids)
-INSERT INTO users_roles (user_id, role_id)
-VALUES (1001, 103), -- test_employee@local.dev => USER
-       (1002, 102), -- test_manager@local.dev => MANAGER
-       (1003, 101), -- power_admin@local.dev => ADMIN
-       (1004, 103)  -- test_user_with_address@local.dev => USER
-ON CONFLICT DO NOTHING;
-
--- Assign scopes to users (using explicit long integer ids)
-INSERT INTO users_scopes (user_id, scope_id)
-VALUES (1001, 201), -- test_employee@local.dev => READ
-       (1002, 201), -- test_manager@local.dev => READ
-       (1002, 202), -- test_manager@local.dev => WRITE
-       (1003, 201), -- power_admin@local.dev => READ
-       (1003, 202), -- power_admin@local.dev => WRITE
-       (1003, 203), -- power_admin@local.dev => UPDATE
-       (1003, 204), -- power_admin@local.dev => DELETE
-       (1004, 201)  -- test_user_with_address@local.dev => READ
-ON CONFLICT DO NOTHING;
 
 -- Example assignment of scopes directly to roles via role_scopes table
 INSERT INTO role_scopes (role_id, scope)
