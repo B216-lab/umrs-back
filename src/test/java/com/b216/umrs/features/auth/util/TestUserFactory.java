@@ -154,5 +154,15 @@ public class TestUserFactory {
     public User ensureDeveloperUser(String username, String password) {
         return ensureUserWithRoles(username, password, com.b216.umrs.features.auth.model.Role.DEVELOPER);
     }
+
+    /**
+     * Удаляет пользователя по имени пользователя (email), если он существует.
+     *
+     * :param username: имя пользователя (email)
+     */
+    public void deleteUser(String username) {
+        userRepository.findByUsername(username)
+            .ifPresent(userRepository::delete);
+    }
 }
 

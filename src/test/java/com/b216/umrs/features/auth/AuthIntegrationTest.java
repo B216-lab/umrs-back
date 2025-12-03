@@ -2,6 +2,7 @@ package com.b216.umrs.features.auth;
 
 import com.b216.umrs.features.auth.util.TestUserFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,14 @@ class AuthIntegrationTest {
         testUserFactory.ensureAdminUser(ADMIN_EMAIL, ADMIN_PASSWORD);
         testUserFactory.ensureManagerUser(MANAGER_EMAIL, MANAGER_PASSWORD);
         testUserFactory.ensureRegularUser(USER_EMAIL, USER_PASSWORD);
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Удаляет тестовых пользователей после каждого теста
+        testUserFactory.deleteUser(ADMIN_EMAIL);
+        testUserFactory.deleteUser(MANAGER_EMAIL);
+        testUserFactory.deleteUser(USER_EMAIL);
     }
 
     @Test
