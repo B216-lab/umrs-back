@@ -49,3 +49,4 @@ src/main/resources/application-dev-mail.yaml
 .env.*.local
 .env
 **/.env
+mailpit-data

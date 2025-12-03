@@ -6,6 +6,7 @@ import com.b216.umrs.features.auth.domain.User;
 import com.b216.umrs.features.auth.repository.RoleRepository;
 import com.b216.umrs.features.auth.repository.UserRepository;
 import com.b216.umrs.features.auth.service.CustomOneTimeTokenService;
+import com.b216.umrs.features.auth.service.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -44,12 +45,11 @@ public class OneTimeTokenAuthController {
     }
 
     /**
-     * DTO-ответ с одноразовым токеном и временем его истечения.
+     * DTO-ответ с временем истечения одноразового токена.
      *
-     * :param token: строковое значение одноразового токена
      * :param expiresAt: момент времени, когда токен истекает
      */
-    public record OneTimeTokenResponse(String token, Instant expiresAt) {
+    public record OneTimeTokenResponse(Instant expiresAt) {
     }
 
     /**
@@ -65,19 +65,22 @@ public class OneTimeTokenAuthController {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public OneTimeTokenAuthController(
         CustomOneTimeTokenService oneTimeTokenService,
         UserDetailsService userDetailsService,
         UserRepository userRepository,
         RoleRepository roleRepository,
-        PasswordEncoder passwordEncoder
+        PasswordEncoder passwordEncoder,
+        EmailService emailService
     ) {
         this.oneTimeTokenService = oneTimeTokenService;
         this.userDetailsService = userDetailsService;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     @PostMapping("/ott")
@@ -85,7 +88,15 @@ public class OneTimeTokenAuthController {
         @RequestBody OneTimeTokenRequest request
     ) {
         CustomOneTimeToken token = oneTimeTokenService.createTokenForUsername(request.email());
-        return ResponseEntity.ok(new OneTimeTokenResponse(token.getTokenValue(), token.getExpiresAt()));
+
+        // Отправить одноразовый токен на email пользователя
+        this.emailService.sendPlainText(
+            request.email().trim(),
+            "Ваш одноразовый код входа",
+            "Ваш одноразовый код: " + token.getTokenValue()
+        );
+
+        return ResponseEntity.ok(new OneTimeTokenResponse(token.getExpiresAt()));
     }
 
     @PostMapping("/submit-ott")
