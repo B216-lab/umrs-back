@@ -11,21 +11,21 @@ import java.util.List;
 @Getter
 @Setter
 public class MovementItemDto {
-    private String typeMovement;
+    private String movementType;
     private List<String> transport;
     private Integer numberPeopleInCar;
-    private Integer pedestrianApproachtoStartingStopOrParkingLot;
-    private Integer waitingTimeForTransport;
+    private Integer walkToStartMinutes;
+    private Integer waitAtStartMinutes;
     private Integer numberOfTransfers;
-    private String waitingTimeBetweenTransfers;
+    private String waitBetweenTransfersMinutes;
     private String departureTime;
     private String departurePlace;
-    private AddressDto coordinatesDepartureAddress;
+    private AddressDto departureAddress;
     private String arrivalTime;
     private String arrivalPlace;
-    private Integer pedestrianApproachFromFinalStopOrParking;
-    private String number;
-    private AddressDto coordinatesArrivalAddress;
+    private Integer walkFromFinishMinutes;
+    private String tripCost;
+    private AddressDto arrivalAddress;
     private String textarea;
 }
 

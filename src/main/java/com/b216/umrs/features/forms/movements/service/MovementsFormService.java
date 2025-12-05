@@ -67,7 +67,7 @@ public class MovementsFormService {
      */
     @Transactional
     public List<Movement> processForm(MovementsFormDto formDto) {
-        LocalDate movementDate = parseDate(formDto.getDateMovements());
+        LocalDate movementDate = parseDate(formDto.getMovementsDate());
         ValidationStatusRef pendingReviewStatus = validationStatusRefRepository
                 .findByCode(ValidationStatus.PENDING_REVIEW)
                 .orElseThrow(() -> new IllegalStateException("ValidationStatus PENDING_REVIEW not found"));
@@ -101,10 +101,10 @@ public class MovementsFormService {
         Movement movement = new Movement();
 
         // Тип перемещения
-        MovementType movementType = MovementType.valueOf(movementItem.getTypeMovement());
+        MovementType movementType = MovementType.valueOf(movementItem.getMovementType());
         MovementTypeRef movementTypeRef = movementTypeRefRepository
                 .findByCode(movementType)
-                .orElseThrow(() -> new IllegalArgumentException("MovementType not found: " + movementItem.getTypeMovement()));
+                .orElseThrow(() -> new IllegalArgumentException("MovementType not found: " + movementItem.getMovementType()));
         movement.setType(movementTypeRef);
 
         // Дата
@@ -128,11 +128,11 @@ public class MovementsFormService {
         movement.setDestinationType(arrivalPlaceTypeRef);
 
         // Адреса (преобразуются в JsonNode)
-        if (movementItem.getCoordinatesDepartureAddress() != null) {
-            movement.setDeparturePlace(convertAddressToJsonNode(movementItem.getCoordinatesDepartureAddress()));
+        if (movementItem.getDepartureAddress() != null) {
+            movement.setDeparturePlace(convertAddressToJsonNode(movementItem.getDepartureAddress()));
         }
-        if (movementItem.getCoordinatesArrivalAddress() != null) {
-            movement.setDestinationPlace(convertAddressToJsonNode(movementItem.getCoordinatesArrivalAddress()));
+        if (movementItem.getArrivalAddress() != null) {
+            movement.setDestinationPlace(convertAddressToJsonNode(movementItem.getArrivalAddress()));
         }
 
         // Статус валидации
@@ -156,11 +156,11 @@ public class MovementsFormService {
         // Пока оставляем null
 
         // Время ожидания
-        if (movementItem.getWaitingTimeForTransport() != null) {
-            movement.setWaitingTime(movementItem.getWaitingTimeForTransport());
-        } else if (movementItem.getWaitingTimeBetweenTransfers() != null) {
+        if (movementItem.getWaitAtStartMinutes() != null) {
+            movement.setWaitingTime(movementItem.getWaitAtStartMinutes());
+        } else if (movementItem.getWaitBetweenTransfersMinutes() != null) {
             try {
-                movement.setWaitingTime(Integer.parseInt(movementItem.getWaitingTimeBetweenTransfers()));
+                movement.setWaitingTime(Integer.parseInt(movementItem.getWaitBetweenTransfersMinutes()));
             } catch (NumberFormatException e) {
                 // Игнорируем неверный формат
             }

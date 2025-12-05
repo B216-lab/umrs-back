@@ -16,10 +16,10 @@ public class MovementsFormDto {
     private String gender;
     private String socialStatus;
     private List<Integer> transportationCosts;
-    private AddressDto coordinatesAddress;
+    private AddressDto homeAddress;
     private List<Integer> financialSituation;
     private String baseComment;
-    private String dateMovements;
+    private String movementsDate;
     private List<MovementItemDto> movements;
 }
 
