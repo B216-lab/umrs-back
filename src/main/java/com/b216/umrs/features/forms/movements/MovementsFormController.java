@@ -13,12 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Контроллер для обработки форм движений.
- * Предоставляет публичные эндпоинты для приёма данных форм.
- */
 @RestController
-@RequestMapping("/api/v1/public/forms/movements")
+@RequestMapping("/api/v1/forms/movements")
 public class MovementsFormController {
 
     private final MovementsFormService movementsFormService;

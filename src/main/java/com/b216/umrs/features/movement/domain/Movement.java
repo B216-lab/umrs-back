@@ -1,10 +1,11 @@
 package com.b216.umrs.features.movement.domain;
 
-import com.b216.umrs.infrastructure.persistence.JsonNodeStringConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,11 +36,11 @@ public class Movement {
      * Геометрия хранится как JSONB (GeoJSON). Для пространственных операций возможно добавление маппинга в Geometry позднее.
      */
     @Column(columnDefinition = "jsonb")
-    @jakarta.persistence.Convert(converter = JsonNodeStringConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode departurePlace;
 
     @Column(columnDefinition = "jsonb")
-    @jakarta.persistence.Convert(converter = JsonNodeStringConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode destinationPlace;
     
     // TODO add readable addresses for departure and destination places

@@ -1,18 +1,28 @@
 package com.b216.umrs.features.forms.movements.dto;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * DTO для адреса из формы.
- * Содержит полную информацию об адресе из внешнего сервиса.
+ * Упрощённый формат: содержит только читаемый адрес и координаты.
  */
 @Getter
 @Setter
 public class AddressDto {
+    /**
+     * Читаемый адрес (текстовое представление).
+     */
     private String value;
-    private String unrestricted_value;
-    private JsonNode data;
+    
+    /**
+     * Широта (latitude).
+     */
+    private Double latitude;
+    
+    /**
+     * Долгота (longitude).
+     */
+    private Double longitude;
 }
 

@@ -12,13 +12,14 @@ import java.util.List;
 @Getter
 @Setter
 public class MovementsFormDto {
-    private Integer age;
+    private String birthday;
     private String gender;
     private String socialStatus;
-    private List<Integer> transportationCosts;
+    private Integer transportCostMin;
+    private Integer transportCostMax;
     private AddressDto homeAddress;
-    private List<Integer> financialSituation;
-    private String baseComment;
+    private Integer incomeMin;
+    private Integer incomeMax;
     private String movementsDate;
     private List<MovementItemDto> movements;
 }

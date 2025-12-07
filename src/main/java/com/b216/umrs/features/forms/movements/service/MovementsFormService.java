@@ -16,9 +16,14 @@ import com.b216.umrs.features.movement.repository.MovementTypeRefRepository;
 import com.b216.umrs.features.movement.repository.PlaceTypeRefRepository;
 import com.b216.umrs.features.movement.repository.ValidationStatusRefRepository;
 import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
+import com.b216.umrs.features.auth.model.Gender;
+import com.b216.umrs.features.auth.repository.UserRepository;
+import com.b216.umrs.features.auth.repository.SocialStatusRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapbox.geojson.Point;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +46,8 @@ public class MovementsFormService {
     private final PlaceTypeRefRepository placeTypeRefRepository;
     private final ValidationStatusRefRepository validationStatusRefRepository;
     private final VehicleTypeRefRepository vehicleTypeRefRepository;
+    private final UserRepository userRepository;
+    private final SocialStatusRepository socialStatusRepository;
     private final ObjectMapper objectMapper;
 
     public MovementsFormService(
@@ -49,6 +56,8 @@ public class MovementsFormService {
             PlaceTypeRefRepository placeTypeRefRepository,
             ValidationStatusRefRepository validationStatusRefRepository,
             VehicleTypeRefRepository vehicleTypeRefRepository,
+            UserRepository userRepository,
+            SocialStatusRepository socialStatusRepository,
             ObjectMapper objectMapper
     ) {
         this.movementRepository = movementRepository;
@@ -56,17 +65,24 @@ public class MovementsFormService {
         this.placeTypeRefRepository = placeTypeRefRepository;
         this.validationStatusRefRepository = validationStatusRefRepository;
         this.vehicleTypeRefRepository = vehicleTypeRefRepository;
+        this.userRepository = userRepository;
+        this.socialStatusRepository = socialStatusRepository;
         this.objectMapper = objectMapper;
     }
 
     /**
      * Обрабатывает данные формы и сохраняет перемещения в базу данных.
+     * Также обновляет профиль пользователя, если данные предоставлены.
      *
      * @param formDto данные формы
      * @return список сохранённых перемещений
      */
     @Transactional
     public List<Movement> processForm(MovementsFormDto formDto) {
+        // Обновляем профиль пользователя, если данные предоставлены
+        updateUserProfile(formDto);
+
+        // Обрабатываем перемещения
         LocalDate movementDate = parseDate(formDto.getMovementsDate());
         ValidationStatusRef pendingReviewStatus = validationStatusRefRepository
                 .findByCode(ValidationStatus.PENDING_REVIEW)
@@ -83,6 +99,94 @@ public class MovementsFormService {
         }
 
         return savedMovements;
+    }
+
+    /**
+     * Обновляет профиль текущего аутентифицированного пользователя данными из формы.
+     *
+     * @param formDto данные формы
+     */
+    private void updateUserProfile(MovementsFormDto formDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+            "anonymous".equals(authentication.getPrincipal())) {
+            return; // Пользователь не аутентифицирован
+        }
+
+        String username = authentication.getName();
+        userRepository.findByUsername(username).ifPresent(user -> {
+            boolean updated = false;
+
+            // Обновляем день рождения
+            if (formDto.getBirthday() != null && !formDto.getBirthday().isEmpty()) {
+                try {
+                    user.setBirthday(LocalDate.parse(formDto.getBirthday()));
+                    updated = true;
+                } catch (Exception e) {
+                    // Игнорируем неверный формат даты
+                }
+            }
+
+            // Обновляем пол
+            if (formDto.getGender() != null && !formDto.getGender().isEmpty()) {
+                try {
+                    user.setGender(Gender.valueOf(formDto.getGender()));
+                    updated = true;
+                } catch (IllegalArgumentException e) {
+                    // Игнорируем неверное значение пола
+                }
+            }
+
+            // Обновляем социальный статус
+            if (formDto.getSocialStatus() != null && !formDto.getSocialStatus().isEmpty()) {
+                try {
+                    com.b216.umrs.features.auth.model.SocialStatus statusEnum =
+                        com.b216.umrs.features.auth.model.SocialStatus.valueOf(formDto.getSocialStatus());
+                    socialStatusRepository.findByCode(statusEnum)
+                        .ifPresent(user::setSocialStatus);
+                    updated = true;
+                } catch (IllegalArgumentException e) {
+                    // Игнорируем неверное значение социального статуса
+                }
+            }
+
+            // Обновляем расходы на транспорт
+            if (formDto.getTransportCostMin() != null) {
+                user.setTransportationCostMin(formDto.getTransportCostMin());
+                updated = true;
+            }
+            if (formDto.getTransportCostMax() != null) {
+                user.setTransportationCostMax(formDto.getTransportCostMax());
+                updated = true;
+            }
+
+            // Обновляем доход
+            if (formDto.getIncomeMin() != null) {
+                user.setMinSalary(formDto.getIncomeMin());
+                updated = true;
+            }
+            if (formDto.getIncomeMax() != null) {
+                user.setMaxSalary(formDto.getIncomeMax());
+                updated = true;
+            }
+
+            // Обновляем домашний адрес
+            if (formDto.getHomeAddress() != null) {
+                AddressDto homeAddress = formDto.getHomeAddress();
+                if (homeAddress.getValue() != null) {
+                    user.setHomeReadablePlace(homeAddress.getValue());
+                }
+                JsonNode homePlaceJson = convertAddressToJsonNode(homeAddress);
+                if (homePlaceJson != null) {
+                    user.setHomePlace(homePlaceJson);
+                }
+                updated = true;
+            }
+
+            if (updated) {
+                userRepository.save(user);
+            }
+        });
     }
 
     /**
@@ -176,45 +280,39 @@ public class MovementsFormService {
 
     /**
      * Преобразует адрес в GeoJSON Point для хранения в JSONB.
-     * Извлекает координаты из данных адреса и создаёт GeoJSON Point используя mapbox-java.
+     * Использует координаты из DTO для создания GeoJSON Point.
      *
-     * @param addressDto DTO адреса
-     * @return JsonNode с GeoJSON Point или полными данными адреса, если координаты отсутствуют
+     * @param addressDto DTO адреса с координатами
+     * @return JsonNode с GeoJSON Point или null, если координаты отсутствуют
      */
     private JsonNode convertAddressToJsonNode(AddressDto addressDto) {
         if (addressDto == null) {
             return null;
         }
 
-        // Пытаемся извлечь координаты из data.geo_lat и data.geo_lon
-        JsonNode dataNode = addressDto.getData();
-        if (dataNode != null && dataNode.has("geo_lat") && dataNode.has("geo_lon")) {
+        // Извлекаем координаты напрямую из DTO
+        Double latitude = addressDto.getLatitude();
+        Double longitude = addressDto.getLongitude();
+        
+        if (latitude != null && longitude != null) {
             try {
-                String latStr = dataNode.get("geo_lat").asText();
-                String lonStr = dataNode.get("geo_lon").asText();
+                // Создаём GeoJSON Point используя mapbox-java (longitude, latitude)
+                Point geoJsonPoint = Point.fromLngLat(longitude, latitude);
                 
-                if (latStr != null && !latStr.isEmpty() && lonStr != null && !lonStr.isEmpty()) {
-                    double latitude = Double.parseDouble(latStr);
-                    double longitude = Double.parseDouble(lonStr);
-                    
-                    // Создаём GeoJSON Point используя mapbox-java (longitude, latitude)
-                    Point geoJsonPoint = Point.fromLngLat(longitude, latitude);
-                    
-                    // Преобразуем Point в JsonNode через toJson() метод
-                    String geoJsonString = geoJsonPoint.toJson();
-                    try {
-                        return objectMapper.readTree(geoJsonString);
-                    } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-                        // Если не удалось распарсить JSON, возвращаем полные данные адреса
-                    }
-                }
-            } catch (NumberFormatException | NullPointerException e) {
-                // Если не удалось распарсить координаты, возвращаем полные данные адреса
+                // Преобразуем Point в JsonNode через toJson() метод
+                String geoJsonString = geoJsonPoint.toJson();
+                return objectMapper.readTree(geoJsonString);
+            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+                // Если не удалось создать GeoJSON, возвращаем null
+                return null;
+            } catch (Exception e) {
+                // Обрабатываем другие ошибки (например, неверные координаты)
+                return null;
             }
         }
         
-        // Если координаты отсутствуют, возвращаем полные данные адреса
-        return objectMapper.valueToTree(addressDto);
+        // Если координаты отсутствуют, возвращаем null
+        return null;
     }
 
     /**

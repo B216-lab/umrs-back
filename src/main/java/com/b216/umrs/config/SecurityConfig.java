@@ -1,9 +1,10 @@
 package com.b216.umrs.config;
 
 import com.b216.umrs.features.auth.model.Role;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,15 +15,13 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import jakarta.servlet.http.HttpServletResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,7 +61,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/submit-ott").permitAll()
                 .requestMatchers("/api/v1/auth/me").authenticated()
                 .requestMatchers("/api/v1/auth/csrf").permitAll()
-                .requestMatchers("/api/v1/public/forms/**").permitAll()
                 .anyRequest().authenticated()
             )
             .logout(logoutConfigurer -> {
@@ -122,6 +120,7 @@ public class SecurityConfig {
 
     /**
      * Returns 401 Unauthorized response body with error message when authentication is required.
+     *
      * @return
      */
     @Bean
@@ -139,6 +138,7 @@ public class SecurityConfig {
 
     /**
      * Returns 403 Forbidden response body with error message when access is denied.
+     *
      * @return
      */
     @Bean
