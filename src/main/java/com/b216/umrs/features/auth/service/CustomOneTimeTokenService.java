@@ -24,7 +24,7 @@ public class CustomOneTimeTokenService implements OneTimeTokenService {
 
     public CustomOneTimeToken createTokenForUsername(String username) {
         String token = UUID.randomUUID().toString();
-        Instant eightHoursFromNow = this.clock.instant().plus(8, ChronoUnit.HOURS);
+        Instant eightHoursFromNow = this.clock.instant().plus(1, ChronoUnit.MINUTES);
         CustomOneTimeToken ott = new CustomOneTimeToken(token, username, eightHoursFromNow);
         tokenRepository.save(ott);
         return ott;

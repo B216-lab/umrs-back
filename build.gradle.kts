@@ -32,16 +32,12 @@ extra["snippetsDir"] = file("build/generated-snippets")
 
 dependencies {
     implementation("com.mapbox.mapboxsdk:mapbox-sdk-geojson:7.9.0")
-    implementation("org.springframework.boot:spring-boot-starter-amqp")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.session:spring-session-data-redis")
-    // OpenAPI (springdoc) for MVC and Spring Data REST
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
-    // Spatial support for PostGIS (Hibernate 6)
     implementation("org.hibernate.orm:hibernate-spatial")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
