@@ -231,12 +231,22 @@ public class MovementsFormService {
                 .orElseThrow(() -> new IllegalArgumentException("PlaceType not found: " + movementItem.getArrivalPlace()));
         movement.setDestinationType(arrivalPlaceTypeRef);
 
-        // Адреса (преобразуются в JsonNode)
+        // Адреса (преобразуются в JsonNode и сохраняются читаемые адреса)
         if (movementItem.getDepartureAddress() != null) {
-            movement.setDeparturePlace(convertAddressToJsonNode(movementItem.getDepartureAddress()));
+            AddressDto departureAddress = movementItem.getDepartureAddress();
+            movement.setDeparturePlace(convertAddressToJsonNode(departureAddress));
+            // Сохраняем читаемый адрес
+            if (departureAddress.getValue() != null) {
+                movement.setDeparturePlaceAddress(departureAddress.getValue());
+            }
         }
         if (movementItem.getArrivalAddress() != null) {
-            movement.setDestinationPlace(convertAddressToJsonNode(movementItem.getArrivalAddress()));
+            AddressDto arrivalAddress = movementItem.getArrivalAddress();
+            movement.setDestinationPlace(convertAddressToJsonNode(arrivalAddress));
+            // Сохраняем читаемый адрес
+            if (arrivalAddress.getValue() != null) {
+                movement.setDestinationPlaceAddress(arrivalAddress.getValue());
+            }
         }
 
         // Статус валидации

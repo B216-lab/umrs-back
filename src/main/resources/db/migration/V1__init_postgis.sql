@@ -100,20 +100,22 @@ ON CONFLICT (code) DO NOTHING;
 -- Create movements table (JSONB for places, FKs to reference tables)
 CREATE TABLE IF NOT EXISTS movements
 (
-    id                        BIGSERIAL PRIMARY KEY,
-    movement_type_id          BIGINT NOT NULL REFERENCES ref_movement_type (id),
-    departure_time            TIMESTAMPTZ,
-    destination_time          TIMESTAMPTZ,
-    day                       DATE,
-    departure_place           JSONB,
-    destination_place         JSONB,
-    departure_place_type_id   BIGINT NOT NULL REFERENCES ref_place_type (id),
-    validation_status_id      BIGINT NOT NULL REFERENCES ref_validation_status (id),
-    destination_place_type_id BIGINT NOT NULL REFERENCES ref_place_type (id),
-    vehicle_type_id           BIGINT NULL REFERENCES ref_vehicle_type (id),
-    cost                      NUMERIC(12, 2),
-    waiting_time              INTEGER,
-    seats_amount              INTEGER
+    id                           BIGSERIAL PRIMARY KEY,
+    movement_type_id             BIGINT NOT NULL REFERENCES ref_movement_type (id),
+    departure_time               TIMESTAMPTZ,
+    destination_time             TIMESTAMPTZ,
+    day                          DATE,
+    departure_place              JSONB,
+    destination_place            JSONB,
+    departure_place_address      VARCHAR(512),
+    destination_place_address    VARCHAR(512),
+    departure_place_type_id      BIGINT NOT NULL REFERENCES ref_place_type (id),
+    validation_status_id         BIGINT NOT NULL REFERENCES ref_validation_status (id),
+    destination_place_type_id    BIGINT NOT NULL REFERENCES ref_place_type (id),
+    vehicle_type_id              BIGINT NULL REFERENCES ref_vehicle_type (id),
+    cost                         NUMERIC(12, 2),
+    waiting_time                 INTEGER,
+    seats_amount                 INTEGER
 );
 
 -- Seed sample movements (using enum ids now)
@@ -124,6 +126,8 @@ INSERT INTO movements(id,
                       day,
                       departure_place,
                       destination_place,
+                      departure_place_address,
+                      destination_place_address,
                       validation_status_id,
                       departure_place_type_id,
                       destination_place_type_id,
@@ -150,6 +154,8 @@ VALUES (1,
                 55.76
             ]
         }'::jsonb,
+        'г. Москва, ул. Ленина, д. 10',            -- departure_place_address
+        'г. Санкт-Петербург, Невский проспект, д. 50', -- destination_place_address
         1, -- PENDING_REVIEW (id = 1 in ref_validation_status)
         1, -- HOME_RESIDENCE (id = 1 in ref_place_type)
         3, -- WORKPLACE (id = 3 in ref_place_type)
@@ -166,6 +172,8 @@ INSERT INTO movements(id,
                       day,
                       departure_place,
                       destination_place,
+                      departure_place_address,
+                      destination_place_address,
                       validation_status_id,
                       departure_place_type_id,
                       destination_place_type_id,
@@ -192,6 +200,8 @@ VALUES (2,
                 55.76
             ]
         }'::jsonb,
+        'г. Москва, ул. Арбат, д. 15',         -- departure_place_address
+        'г. Москва, ул. Тверская, д. 22',      -- destination_place_address
         1, -- PENDING_REVIEW (id = 1 in ref_validation_status)
         1, -- HOME_RESIDENCE (id = 1 in ref_place_type)
         12, -- STORE_MARKET (id = 12 in ref_place_type)
@@ -302,4 +312,32 @@ CREATE TABLE IF NOT EXISTS one_time_tokens
     token_value VARCHAR(255) NOT NULL,
     username    VARCHAR(255) NOT NULL,
     expires_at  TIMESTAMP    NOT NULL
+);
+
+-- Spring Session JDBC tables
+-- Схема таблиц для хранения сессий в базе данных
+
+CREATE TABLE IF NOT EXISTS spring_session
+(
+    primary_id            CHAR(36) NOT NULL,
+    session_id            VARCHAR(36) NOT NULL,
+    creation_time         BIGINT NOT NULL,
+    last_access_time      BIGINT NOT NULL,
+    max_inactive_interval INTEGER NOT NULL,
+    expiry_time           BIGINT NOT NULL,
+    principal_name        VARCHAR(100),
+    CONSTRAINT spring_session_pk PRIMARY KEY (primary_id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS spring_session_ix1 ON spring_session (session_id);
+CREATE INDEX IF NOT EXISTS spring_session_ix2 ON spring_session (expiry_time);
+CREATE INDEX IF NOT EXISTS spring_session_ix3 ON spring_session (principal_name);
+
+CREATE TABLE IF NOT EXISTS spring_session_attributes
+(
+    session_primary_id CHAR(36) NOT NULL,
+    attribute_name     VARCHAR(200) NOT NULL,
+    attribute_bytes    BYTEA NOT NULL,
+    CONSTRAINT spring_session_attributes_pk PRIMARY KEY (session_primary_id, attribute_name),
+    CONSTRAINT spring_session_attributes_fk FOREIGN KEY (session_primary_id) REFERENCES spring_session (primary_id) ON DELETE CASCADE
 );

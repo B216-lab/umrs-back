@@ -19,4 +19,3 @@ public interface SocialStatusRepository extends JpaRepository<SocialStatus, Long
      */
     Optional<SocialStatus> findByCode(com.b216.umrs.features.auth.model.SocialStatus code);
 }
-

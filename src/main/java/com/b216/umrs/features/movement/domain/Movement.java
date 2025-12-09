@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 public class Movement {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)
@@ -32,9 +32,6 @@ public class Movement {
 
     private LocalDate day;
 
-    /**
-     * Геометрия хранится как JSONB (GeoJSON). Для пространственных операций возможно добавление маппинга в Geometry позднее.
-     */
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode departurePlace;
@@ -43,7 +40,19 @@ public class Movement {
     @JdbcTypeCode(SqlTypes.JSON)
     private JsonNode destinationPlace;
     
-    // TODO add readable addresses for departure and destination places
+    /**
+     * Читаемый адрес отправления с минимумом данных, определяющих адрес, т.е. никаких почтовых индексов и тд.
+     * Например: "г. Москва, ул. Ленина, д. 10"
+     */
+    @Column(name = "departure_place_address", length = 512)
+    private String departurePlaceAddress;
+
+    /**
+     * Читаемый адрес назначения с минимумом данных, определяющих адрес, т.е. никаких почтовых индексов и тд.
+     * Например: "г. Санкт-Петербург, Невский проспект, д. 50"
+     */
+    @Column(name = "destination_place_address", length = 512)
+    private String destinationPlaceAddress;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "departure_place_type_id", nullable = false)
@@ -70,5 +79,3 @@ public class Movement {
     private Integer seatsAmount;
 
 }
-
-
