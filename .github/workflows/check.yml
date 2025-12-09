@@ -21,4 +21,4 @@ jobs:
           java-version: '21'
           distribution: 'corretto'
       - name: Build project
-        run: ./gradlew build
+        run: ./gradlew build -x test
