@@ -1,0 +1,67 @@
+name: Continuous Deployment - Backend
+
+on:
+  pull_request:
+    branches:
+      - release/*
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/umrs-back
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # - name: Install SSH client
+      #   run: sudo apt-get update && sudo apt-get install -y openssh-client
+
+      # - name: Deploy to VM
+      #   env:
+      #     SSH_HOST: ${{ vars.SSH_HOST }}
+      #     SSH_USER: ${{ secrets.SSH_USER }}
+      #     SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+      #     IMAGE_TAG: ${{ steps.meta.outputs.tags }}
+      #   run: |
+      #     echo "${{ env.SERVER_SSH_KEY }}" > key.pem
+      #     chmod 600 key.pem
+      #     ssh -i key.pem -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.SSH_HOST }} << 'EOF'
+      #       docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.MY_PERSONAL_PAT }}
+      #       docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      #       cd ~
+      #       docker compose down frontend
+      #       docker compose up -d frontend
+      #     EOF
+      #     # Clean up the private key.pem
+      #     rm key.pem
