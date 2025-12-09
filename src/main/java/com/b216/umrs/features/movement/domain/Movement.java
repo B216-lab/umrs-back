@@ -75,4 +75,20 @@ public class Movement {
 
     private Integer seatsAmount;
 
+    @Column(name = "comment", length = 2000)
+    private String comment;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
+    /**
+     * Устанавливает время создания перед сохранением в базу данных.
+     */
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = OffsetDateTime.now();
+        }
+    }
+
 }

@@ -282,6 +282,11 @@ public class MovementsFormService {
             movement.setSeatsAmount(movementItem.getNumberPeopleInCar());
         }
 
+        // Комментарий
+        if (movementItem.getComment() != null && !movementItem.getComment().isEmpty()) {
+            movement.setComment(movementItem.getComment());
+        }
+
         return movement;
     }
 

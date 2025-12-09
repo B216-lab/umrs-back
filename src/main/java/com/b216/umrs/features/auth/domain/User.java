@@ -14,6 +14,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,9 +68,9 @@ public class User implements Serializable {
     @JoinColumn(name = "social_status_id")
     private SocialStatusRef socialStatus;
 
-    private LocalDate lastLogin = LocalDate.now();
+    private LocalDate lastLogin;
 
-    private LocalDate creationDate = LocalDate.now();
+    private LocalDate creationDate;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -86,4 +88,25 @@ public class User implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<RoleRef> roles;
+
+    /**
+     * Устанавливает дату создания перед сохранением нового пользователя в базу данных.
+     */
+    @PrePersist
+    protected void onCreate() {
+        if (creationDate == null) {
+            creationDate = LocalDate.now();
+        }
+    }
+
+    /**
+     * Обновляет дату последнего входа при обновлении пользователя в базе данных.
+     * Обновляется только если поле не было установлено вручную.
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        if (lastLogin == null) {
+            lastLogin = LocalDate.now();
+        }
+    }
 }

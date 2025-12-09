@@ -26,6 +26,6 @@ public class MovementItemDto {
     private Integer walkFromFinishMinutes;
     private String tripCost;
     private AddressDto arrivalAddress;
-    private String textarea;
+    private String comment;
 }
 

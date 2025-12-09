@@ -51,7 +51,9 @@ CREATE TABLE IF NOT EXISTS movements
     vehicle_type_id              BIGINT NULL REFERENCES ref_vehicle_type (id),
     cost                         NUMERIC(12, 2),
     waiting_time                 INTEGER,
-    seats_amount                 INTEGER
+    seats_amount                 INTEGER,
+    comment                      VARCHAR(2000),
+    created_at                   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 

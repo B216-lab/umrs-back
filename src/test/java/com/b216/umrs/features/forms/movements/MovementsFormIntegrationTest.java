@@ -77,7 +77,7 @@ class MovementsFormIntegrationTest {
      */
     @Test
     @WithMockUser(username = TEST_USER_EMAIL)
-    void givenFormWithMultipleMovements_whenSubmitForm_thenAllSaved() throws Exception {
+    void tsconfig.apptsconfig.appgivenFormWithMultipleMovements_whenSubmitForm_thenAllSaved() throws Exception {
         MovementsFormDto formDto = createValidFormDto();
         
         // Add second movement
