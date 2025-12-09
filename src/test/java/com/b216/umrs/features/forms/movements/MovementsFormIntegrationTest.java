@@ -77,9 +77,9 @@ class MovementsFormIntegrationTest {
      */
     @Test
     @WithMockUser(username = TEST_USER_EMAIL)
-    void tsconfig.apptsconfig.appgivenFormWithMultipleMovements_whenSubmitForm_thenAllSaved() throws Exception {
+    void givenFormWithMultipleMovements_whenSubmitForm_thenAllSaved() throws Exception {
         MovementsFormDto formDto = createValidFormDto();
-        
+
         // Add second movement
         MovementItemDto secondMovement = createValidMovementItem();
         secondMovement.setDepartureTime("14:00");
@@ -139,7 +139,7 @@ class MovementsFormIntegrationTest {
     void givenFormWithAddresses_whenSubmitForm_thenSuccess() throws Exception {
         MovementsFormDto formDto = createValidFormDto();
         MovementItemDto movement = formDto.getMovements().get(0);
-        
+
         // Add addresses with coordinates
         AddressDto departureAddress = new AddressDto();
         departureAddress.setValue("г. Москва, ул. Ленина, д. 10");
@@ -196,12 +196,12 @@ class MovementsFormIntegrationTest {
     private MovementsFormDto createValidFormDto() {
         MovementsFormDto formDto = new MovementsFormDto();
         formDto.setMovementsDate("2025-12-10");
-        
+
         MovementItemDto movement = createValidMovementItem();
         List<MovementItemDto> movements = new ArrayList<>();
         movements.add(movement);
         formDto.setMovements(movements);
-        
+
         return formDto;
     }
 
