@@ -1,7 +1,7 @@
 package com.b216.umrs.features.auth.util;
 
-import com.b216.umrs.features.auth.domain.Role;
-import com.b216.umrs.features.auth.domain.Scope;
+import com.b216.umrs.features.auth.domain.RoleRef;
+import com.b216.umrs.features.auth.domain.ScopeRef;
 import com.b216.umrs.features.auth.domain.User;
 import com.b216.umrs.features.auth.repository.RoleRepository;
 import com.b216.umrs.features.auth.repository.ScopeRepository;
@@ -51,9 +51,9 @@ public class TestUserFactory {
         user.setEnabled(true);
         user.setLocked(false);
 
-        List<Role> roles = new ArrayList<>();
+        List<RoleRef> roles = new ArrayList<>();
         for (com.b216.umrs.features.auth.model.Role roleEnum : roleEnums) {
-            Role role = roleRepository.findByName(roleEnum)
+            RoleRef role = roleRepository.findByName(roleEnum)
                 .orElseThrow(() -> new IllegalStateException(
                     "Role " + roleEnum + " not found in database. Ensure migrations are applied."));
             roles.add(role);
@@ -90,18 +90,18 @@ public class TestUserFactory {
         user.setEnabled(true);
         user.setLocked(false);
 
-        List<Role> roles = new ArrayList<>();
+        List<RoleRef> roles = new ArrayList<>();
         for (com.b216.umrs.features.auth.model.Role roleEnum : roleEnums) {
-            Role role = roleRepository.findByName(roleEnum)
+            RoleRef role = roleRepository.findByName(roleEnum)
                 .orElseThrow(() -> new IllegalStateException(
                     "Role " + roleEnum + " not found in database. Ensure migrations are applied."));
             roles.add(role);
         }
         user.setRoles(roles);
 
-        List<Scope> scopes = new ArrayList<>();
+        List<ScopeRef> scopes = new ArrayList<>();
         for (com.b216.umrs.features.auth.model.Scope scopeEnum : scopeEnums) {
-            Scope scope = scopeRepository.findByName(scopeEnum)
+            ScopeRef scope = scopeRepository.findByName(scopeEnum)
                 .orElseThrow(() -> new IllegalStateException(
                     "Scope " + scopeEnum + " not found in database. Ensure migrations are applied."));
             scopes.add(scope);

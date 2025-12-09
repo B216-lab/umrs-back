@@ -1,7 +1,8 @@
 package com.b216.umrs.features.auth.bootstrap;
 
-import com.b216.umrs.features.auth.domain.Role;
+import com.b216.umrs.features.auth.domain.RoleRef;
 import com.b216.umrs.features.auth.domain.User;
+import com.b216.umrs.features.auth.model.Role;
 import com.b216.umrs.features.auth.repository.RoleRepository;
 import com.b216.umrs.features.auth.repository.UserRepository;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class AdminUserInitializer implements ApplicationRunner {
             return;
         }
 
-        Role adminRole = roleRepository.findByName(com.b216.umrs.features.auth.model.Role.ADMIN)
+        RoleRef adminRole = roleRepository.findByName(Role.ADMIN)
             .orElseThrow(() -> new IllegalStateException("ADMIN role not found in database"));
 
         User admin = new User();

@@ -1,5 +1,6 @@
 package com.b216.umrs.features.auth.domain;
 
+import com.b216.umrs.features.auth.model.SocialStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,14 +11,14 @@ import java.io.Serializable;
 @Table(name = "social_statuses")
 @Getter
 @Setter
-public class SocialStatus implements Serializable {
+public class SocialStatusRef implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true, length = 64)
-    private com.b216.umrs.features.auth.model.SocialStatus code;
+    private SocialStatus code;
 
     @Column(name = "description_ru", nullable = false, length = 512)
     private String descriptionRu;

@@ -8,7 +8,6 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 
@@ -29,8 +28,6 @@ public class Movement {
     private OffsetDateTime departureTime;
 
     private OffsetDateTime destinationTime;
-
-    private LocalDate day;
 
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)

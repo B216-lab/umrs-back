@@ -1,8 +1,9 @@
 package com.b216.umrs.features.auth.controller;
 
 import com.b216.umrs.features.auth.domain.User;
+import com.b216.umrs.features.auth.domain.RoleRef;
+import com.b216.umrs.features.auth.model.Role;
 import com.b216.umrs.features.auth.dto.SignupRequest;
-import com.b216.umrs.features.auth.domain.Role;
 import com.b216.umrs.features.auth.repository.RoleRepository;
 import com.b216.umrs.features.auth.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -70,7 +71,7 @@ public class SignupController {
         }
 
         // Получение роли USER по умолчанию
-        Role userRole = roleRepository.findByName(com.b216.umrs.features.auth.model.Role.USER)
+        RoleRef userRole = roleRepository.findByName(Role.USER)
             .orElseThrow(() -> new RuntimeException("Default USER role not found in database"));
 
         // Создание нового пользователя
@@ -79,7 +80,7 @@ public class SignupController {
         newUser.setPassword(passwordEncoder.encode(request.password()));
 
         // Назначение роли USER
-        List<Role> roles = new ArrayList<>();
+        List<RoleRef> roles = new ArrayList<>();
         roles.add(userRole);
         newUser.setRoles(roles);
         newUser.setScopes(new ArrayList<>());

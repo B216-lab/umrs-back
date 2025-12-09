@@ -1,8 +1,9 @@
 package com.b216.umrs.features.auth.controller;
 
 import com.b216.umrs.features.auth.domain.CustomOneTimeToken;
-import com.b216.umrs.features.auth.domain.Role;
+import com.b216.umrs.features.auth.domain.RoleRef;
 import com.b216.umrs.features.auth.domain.User;
+import com.b216.umrs.features.auth.model.Role;
 import com.b216.umrs.features.auth.repository.RoleRepository;
 import com.b216.umrs.features.auth.repository.UserRepository;
 import com.b216.umrs.features.auth.service.CustomOneTimeTokenService;
@@ -155,7 +156,7 @@ public class OneTimeTokenAuthController {
      * :return: созданный пользователь
      */
     private User createUserForEmail(String email) {
-        Role userRole = roleRepository.findByName(com.b216.umrs.features.auth.model.Role.USER)
+        RoleRef userRole = roleRepository.findByName(Role.USER)
             .orElseThrow(() -> new IllegalStateException("Default USER role not found in database"));
 
         User newUser = new User();
@@ -164,7 +165,7 @@ public class OneTimeTokenAuthController {
         String randomPassword = UUID.randomUUID().toString();
         newUser.setPassword(passwordEncoder.encode(randomPassword));
 
-        List<Role> roles = new ArrayList<>();
+        List<RoleRef> roles = new ArrayList<>();
         roles.add(userRole);
         newUser.setRoles(roles);
         newUser.setScopes(new ArrayList<>());

@@ -64,7 +64,7 @@ public class User implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "social_status_id")
-    private SocialStatus socialStatus;
+    private SocialStatusRef socialStatus;
 
     private LocalDate lastLogin = LocalDate.now();
 
@@ -76,7 +76,7 @@ public class User implements Serializable {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "scope_id")
     )
-    private List<Scope> scopes;
+    private List<ScopeRef> scopes;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -85,5 +85,5 @@ public class User implements Serializable {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private List<Role> roles;
+    private List<RoleRef> roles;
 }

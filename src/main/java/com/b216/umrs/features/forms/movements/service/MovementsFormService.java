@@ -193,13 +193,13 @@ public class MovementsFormService {
      * Преобразует DTO перемещения в сущность Movement.
      *
      * @param movementItem DTO перемещения
-     * @param day дата перемещения
+     * @param movementDate дата перемещения (используется для парсинга времени)
      * @param validationStatus статус валидации
      * @return сущность Movement
      */
     private Movement convertToMovement(
             MovementItemDto movementItem,
-            LocalDate day,
+            LocalDate movementDate,
             ValidationStatusRef validationStatus
     ) {
         Movement movement = new Movement();
@@ -211,12 +211,9 @@ public class MovementsFormService {
                 .orElseThrow(() -> new IllegalArgumentException("MovementType not found: " + movementItem.getMovementType()));
         movement.setType(movementTypeRef);
 
-        // Дата
-        movement.setDay(day);
-
         // Время отправления и прибытия
-        movement.setDepartureTime(parseTime(movementItem.getDepartureTime(), day));
-        movement.setDestinationTime(parseTime(movementItem.getArrivalTime(), day));
+        movement.setDepartureTime(parseTime(movementItem.getDepartureTime(), movementDate));
+        movement.setDestinationTime(parseTime(movementItem.getArrivalTime(), movementDate));
 
         // Типы мест отправления и прибытия
         PlaceType departurePlaceType = PlaceType.valueOf(movementItem.getDeparturePlace());
