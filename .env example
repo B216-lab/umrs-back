@@ -1,6 +1,6 @@
 MAIL_HOST=smtp.gmail.ru
 MAIL_PORT=587
-MAIL_USERNAME=kirill.zhilenckov@gmail.com
+MAIL_USERNAME=some-mail@gmail.com
 MAIL_PASSWORD=some-password
 MAIL_SMTP_AUTH=true
 MAIL_SMTP_STARTTLS_ENABLE=true

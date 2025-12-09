@@ -1,6 +1,6 @@
 ###################################### dev environment properties
 spring:
-    config.import: file:.env[.properties]
+    config.import: optional:file:.env[.properties]
     application.name: umrs-backend
     banner.location: banner.txt
     mail:
@@ -54,5 +54,5 @@ springdoc:
 
 app:
   admin:
-    username: ${APP_ADMIN_USERNAME:}
-    password: ${APP_ADMIN_PASSWORD:}
+    username: ${APP_ADMIN_USERNAME:admin@example.com}
+    password: ${APP_ADMIN_PASSWORD:some-admin-password}
