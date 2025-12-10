@@ -1,9 +1,9 @@
 name: Continuous Deployment - Backend
 
 on:
-  pull_request:
-    branches:
-      - release/*
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 env:
@@ -33,16 +33,21 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/umrs-back
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=sha
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
 
       - name: Build and push Docker image
         id: push
-        uses: docker/build-push-action@6
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
 
       # - name: Install SSH client
       #   run: sudo apt-get update && sudo apt-get install -y openssh-client
