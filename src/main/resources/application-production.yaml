@@ -39,10 +39,17 @@ server:
 
 logging:
     level:
-        org.hibernate.SQL: error
-        org.hibernate.type.descriptor.sql: trace
-        org.springframework.security: error
-    file.path: logs/myapp.log
+        # Root logger level (TRACE, DEBUG, INFO, WARN, ERROR, OFF)
+        root: ${LOGGING_LEVEL_ROOT:INFO}
+        # Hibernate SQL logging
+        org.hibernate.SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:error}
+        # Hibernate parameter binding logging
+        org.hibernate.type.descriptor.sql: ${LOGGING_LEVEL_HIBERNATE_TYPE:OFF}
+        # Spring Security logging
+        org.springframework.security: ${LOGGING_LEVEL_SPRING_SECURITY:error}
+        # Application package logging (adjust package name as needed)
+        com.b216.umrs: ${LOGGING_LEVEL_APP:INFO}
+    file.path: ${LOGGING_FILE_PATH:logs/myapp.log}
 
 springdoc:
     api-docs.path: /docs
@@ -51,3 +58,11 @@ app:
     admin:
         username: ${APP_ADMIN_USERNAME}
         password: ${APP_ADMIN_PASSWORD}
+
+# CORS configuration
+cors:
+    # Разрешённые origins для CORS (через запятую, с портами)
+    # Пример: https://example.com:443,https://app.example.com:443
+    # Должно быть задано через переменную окружения CORS_ALLOWED_ORIGINS
+    allowed:
+        origins: ${CORS_ALLOWED_ORIGINS}

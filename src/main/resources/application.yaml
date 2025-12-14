@@ -39,12 +39,17 @@ server:
 
 logging:
     level:
-        # root: DEBUG
-        # com.myapp.service=INFO:
-        org.hibernate.SQL: debug
-        org.hibernate.type.descriptor.sql: trace
-        org.springframework.security: DEBUG
-    file.path: logs/myapp.log
+        # Root logger level (TRACE, DEBUG, INFO, WARN, ERROR, OFF)
+        root: ${LOGGING_LEVEL_ROOT:INFO}
+        # Hibernate SQL logging
+        org.hibernate.SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:debug}
+        # Hibernate parameter binding logging
+        org.hibernate.type.descriptor.sql: ${LOGGING_LEVEL_HIBERNATE_TYPE:trace}
+        # Spring Security logging
+        org.springframework.security: ${LOGGING_LEVEL_SPRING_SECURITY:DEBUG}
+        # Application package logging (adjust package name as needed)
+        com.b216.umrs: ${LOGGING_LEVEL_APP:INFO}
+    file.path: ${LOGGING_FILE_PATH:logs/myapp.log}
 
 springdoc:
     api-docs.path: /docs
@@ -53,3 +58,10 @@ app:
     admin:
         username: ${APP_ADMIN_USERNAME:admin@example.com}
         password: ${APP_ADMIN_PASSWORD:some-admin-password}
+
+# CORS configuration
+cors:
+    # Разрешённые origins для CORS (через запятую, с портами)
+    # Пример: http://localhost:5173,https://example.com:443,http://frontend:80
+    allowed:
+        origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://manual-geoform:5173,http://manual-geoform:80,http://frontend:5173,http://frontend:80}

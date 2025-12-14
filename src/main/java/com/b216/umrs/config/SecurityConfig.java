@@ -19,19 +19,30 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    /**
+     * Разрешённые origins для CORS.
+     * Может быть задано через переменную окружения CORS_ALLOWED_ORIGINS (через запятую).
+     * По умолчанию используются значения для разработки.
+     */
+    @Value("${cors.allowed.origins:http://localhost:5173,http://localhost:3000,http://manual-geoform:5173,http://manual-geoform:80,http://frontend:5173,http://frontend:80}")
+    private String corsAllowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,14 +96,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "http://manual-geoform:5173",
-            "http://manual-geoform:80",
-            "http://frontend:5173",
-            "http://frontend:80"
-        ));
+        
+        // Парсим разрешённые origins из переменной окружения (разделённые запятой)
+        List<String> allowedOrigins = parseAllowedOrigins(corsAllowedOrigins);
+        configuration.setAllowedOrigins(allowedOrigins);
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // Включает отправку cookies (JSESSIONID)
@@ -101,6 +109,24 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Парсит строку с разрешёнными origins (разделённые запятой) в список.
+     * Удаляет пробелы и пустые значения.
+     *
+     * @param originsStr строка с origins, разделёнными запятой
+     * @return список origins
+     */
+    private List<String> parseAllowedOrigins(String originsStr) {
+        if (originsStr == null || originsStr.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        return Arrays.stream(originsStr.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Bean
