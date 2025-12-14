@@ -1,6 +1,5 @@
 package com.b216.umrs.config;
 
-import com.b216.umrs.features.auth.model.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -52,29 +50,10 @@ public class SecurityConfig {
                 httpSecuritySessionManagementConfigurer.maximumSessions(15)
                     .maxSessionsPreventsLogin(true)
             )
-            .csrf(csrf -> csrf
-                // Use cookie-based CSRF tokens that are readable from JavaScript (for SPA clients)
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // Public forms endpoints are consumed without CSRF tokens (e.g. embedded Vueform),
-                // so CSRF protection is not applied there
-                .ignoringRequestMatchers("/api/v1/public/forms/**")
-            )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/manager/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.name(), Role.DEVELOPER.name(), Role.MANAGER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
-                .requestMatchers("/api/v1/public/**").permitAll()
-                .requestMatchers("/api/v1/signup/**").permitAll()
-                .requestMatchers("/api/v1/auth/login").permitAll()
-                .requestMatchers("/api/v1/auth/logout").permitAll()
-                .requestMatchers("/api/v1/auth/ott").permitAll()
-                .requestMatchers("/api/v1/auth/submit-ott").permitAll()
-                .requestMatchers("/api/v1/auth/me").authenticated()
-                .requestMatchers("/api/v1/auth/csrf").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                .anyRequest().authenticated()
-            )
+            // Публичный режим: форма и отправка данных доступны без входа.
+            // CSRF отключён, чтобы клиент мог отправлять данные без получения токена.
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
             .logout(logoutConfigurer -> {
                 logoutConfigurer.logoutUrl("/logout");
                 logoutConfigurer.invalidateHttpSession(true);
