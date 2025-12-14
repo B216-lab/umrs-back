@@ -4,15 +4,16 @@ spring:
     application.name: umrs-backend
     banner.location: banner.txt
     mail:
-        host: ${MAIL_HOST}
-        port: ${MAIL_PORT}
-        username: ${MAIL_USERNAME}
-        password: ${MAIL_PASSWORD}
+        # Почта может быть отключена через app.mail.enabled=false, тогда настройки SMTP не обязательны.
+        host: ${MAIL_HOST:}
+        port: ${MAIL_PORT:0}
+        username: ${MAIL_USERNAME:}
+        password: ${MAIL_PASSWORD:}
         properties:
-            mail.smtp.auth: ${MAIL_SMTP_AUTH}
-            mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE}
-            mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED}
-            mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST}
+            mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+            mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:false}
+            mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED:false}
+            mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST:}
     jpa:
         hibernate.ddl-auto: update
     datasource:
@@ -58,6 +59,8 @@ app:
     admin:
         username: ${APP_ADMIN_USERNAME}
         password: ${APP_ADMIN_PASSWORD}
+    mail:
+        enabled: ${APP_MAIL_ENABLED:false}
 
 # CORS configuration
 cors:

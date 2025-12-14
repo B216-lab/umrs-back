@@ -58,6 +58,8 @@ app:
     admin:
         username: ${APP_ADMIN_USERNAME:admin@example.com}
         password: ${APP_ADMIN_PASSWORD:some-admin-password}
+    mail:
+        enabled: ${APP_MAIL_ENABLED:false}
 
 # CORS configuration
 cors:
