@@ -13,9 +13,6 @@ spring:
             mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:false}
             mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED:false}
             mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST:localhost}
-    docker:
-        compose:
-            file: compose-dev.yaml
     jpa:
         hibernate.ddl-auto: update
     datasource:
@@ -53,6 +50,6 @@ springdoc:
     api-docs.path: /docs
 
 app:
-  admin:
-    username: ${APP_ADMIN_USERNAME:admin@example.com}
-    password: ${APP_ADMIN_PASSWORD:some-admin-password}
+    admin:
+        username: ${APP_ADMIN_USERNAME:admin@example.com}
+        password: ${APP_ADMIN_PASSWORD:some-admin-password}

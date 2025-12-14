@@ -1,6 +1,6 @@
 ###################################### production environment properties
 spring:
-    config.import: file:.env[.properties]
+    config.import: optional:file:.env[.properties]
     application.name: umrs-backend
     banner.location: banner.txt
     mail:
@@ -28,6 +28,11 @@ spring:
     # Spring Data REST base path for rest repositories
     data.rest.base-path: /api/v1
     threads.virtual.enabled: true
+    session:
+        store-type: jdbc
+        jdbc:
+            initialize-schema: never  # Используем Flyway для миграций
+        timeout: 30m  # Время жизни сессии (30 минут)
 
 server:
     port: ${SERVER_PORT}
