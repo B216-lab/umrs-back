@@ -61,6 +61,13 @@ app:
     mail:
         enabled: ${APP_MAIL_ENABLED:false}
 
+# Actuator health checks configuration
+management:
+    health:
+        # Отключает проверку здоровья почтового сервиса, если почта отключена
+        mail:
+            enabled: ${APP_MAIL_ENABLED:false}
+
 # CORS configuration
 cors:
     # Разрешённые origins для CORS (через запятую, с портами)
