@@ -48,24 +48,16 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
 
-      # - name: Install SSH client
-      #   run: sudo apt-get update && sudo apt-get install -y openssh-client
 
-      # - name: Deploy to VM
-      #   env:
-      #     SSH_HOST: ${{ vars.SSH_HOST }}
-      #     SSH_USER: ${{ secrets.SSH_USER }}
-      #     SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
-      #     IMAGE_TAG: ${{ steps.meta.outputs.tags }}
-      #   run: |
-      #     echo "${{ env.SERVER_SSH_KEY }}" > key.pem
-      #     chmod 600 key.pem
-      #     ssh -i key.pem -o StrictHostKeyChecking=no ${{ env.SSH_USER }}@${{ env.SSH_HOST }} << 'EOF'
-      #       docker login ${{ env.REGISTRY }} -u ${{ github.actor }} -p ${{ secrets.MY_PERSONAL_PAT }}
-      #       docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-      #       cd ~
-      #       docker compose down frontend
-      #       docker compose up -d frontend
-      #     EOF
-      #     # Clean up the private key.pem
-      #     rm key.pem
+      - name: update docker image and restart
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /opt/umrs-back
+            docker compose down app
+            docker compose pull app
+            docker compose up -d app
