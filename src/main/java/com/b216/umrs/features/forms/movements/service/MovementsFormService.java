@@ -19,6 +19,8 @@ import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
 import com.b216.umrs.features.auth.model.Gender;
 import com.b216.umrs.features.auth.repository.UserRepository;
 import com.b216.umrs.features.auth.repository.SocialStatusRepository;
+import com.b216.umrs.features.forms.movements.domain.MovementsFormSubmission;
+import com.b216.umrs.features.forms.movements.repository.MovementsFormSubmissionRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapbox.geojson.Point;
@@ -48,6 +50,7 @@ public class MovementsFormService {
     private final VehicleTypeRefRepository vehicleTypeRefRepository;
     private final UserRepository userRepository;
     private final SocialStatusRepository socialStatusRepository;
+    private final MovementsFormSubmissionRepository movementsFormSubmissionRepository;
     private final ObjectMapper objectMapper;
 
     public MovementsFormService(
@@ -58,6 +61,7 @@ public class MovementsFormService {
             VehicleTypeRefRepository vehicleTypeRefRepository,
             UserRepository userRepository,
             SocialStatusRepository socialStatusRepository,
+            MovementsFormSubmissionRepository movementsFormSubmissionRepository,
             ObjectMapper objectMapper
     ) {
         this.movementRepository = movementRepository;
@@ -67,19 +71,25 @@ public class MovementsFormService {
         this.vehicleTypeRefRepository = vehicleTypeRefRepository;
         this.userRepository = userRepository;
         this.socialStatusRepository = socialStatusRepository;
+        this.movementsFormSubmissionRepository = movementsFormSubmissionRepository;
         this.objectMapper = objectMapper;
     }
 
     /**
      * Обрабатывает данные формы и сохраняет перемещения в базу данных.
-     * Также обновляет профиль пользователя, если данные предоставлены.
+     * Создаёт запись MovementsFormSubmission для хранения данных пользователя из формы.
+     * Также обновляет профиль пользователя, если данные предоставлены и пользователь аутентифицирован.
      *
      * @param formDto данные формы
      * @return список сохранённых перемещений
      */
     @Transactional
     public List<Movement> processForm(MovementsFormDto formDto) {
-        // Обновляем профиль пользователя, если данные предоставлены
+        // Создаём запись MovementsFormSubmission
+        MovementsFormSubmission formSubmission = createMovementsFormSubmission(formDto);
+        formSubmission = movementsFormSubmissionRepository.save(formSubmission);
+
+        // Обновляем профиль пользователя, если пользователь аутентифицирован
         updateUserProfile(formDto);
 
         // Обрабатываем перемещения
@@ -92,6 +102,7 @@ public class MovementsFormService {
 
         for (MovementItemDto movementItem : formDto.getMovements()) {
             Movement movement = convertToMovement(movementItem, movementDate, pendingReviewStatus);
+            movement.setMovementsFormSubmission(formSubmission);
             Movement saved = movementRepository.save(movement);
             if (saved != null) {
                 savedMovements.add(saved);
@@ -187,6 +198,86 @@ public class MovementsFormService {
                 userRepository.save(user);
             }
         });
+    }
+
+    /**
+     * Создаёт сущность MovementsFormSubmission из данных формы.
+     * Связывает с пользователем, если он аутентифицирован.
+     *
+     * @param formDto данные формы
+     * @return сущность MovementsFormSubmission
+     */
+    private MovementsFormSubmission createMovementsFormSubmission(MovementsFormDto formDto) {
+        MovementsFormSubmission submission = new MovementsFormSubmission();
+
+        // Связываем с пользователем, если он аутентифицирован
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+            !"anonymous".equals(authentication.getPrincipal())) {
+            String username = authentication.getName();
+            userRepository.findByUsername(username).ifPresent(submission::setUser);
+        }
+
+        // День рождения
+        if (formDto.getBirthday() != null && !formDto.getBirthday().isEmpty()) {
+            try {
+                submission.setBirthday(LocalDate.parse(formDto.getBirthday()));
+            } catch (Exception e) {
+                // Игнорируем неверный формат даты
+            }
+        }
+
+        // Пол
+        if (formDto.getGender() != null && !formDto.getGender().isEmpty()) {
+            try {
+                submission.setGender(Gender.valueOf(formDto.getGender()));
+            } catch (IllegalArgumentException e) {
+                // Игнорируем неверное значение пола
+            }
+        }
+
+        // Социальный статус
+        if (formDto.getSocialStatus() != null && !formDto.getSocialStatus().isEmpty()) {
+            try {
+                com.b216.umrs.features.auth.model.SocialStatus statusEnum =
+                    com.b216.umrs.features.auth.model.SocialStatus.valueOf(formDto.getSocialStatus());
+                socialStatusRepository.findByCode(statusEnum)
+                    .ifPresent(submission::setSocialStatus);
+            } catch (IllegalArgumentException e) {
+                // Игнорируем неверное значение социального статуса
+            }
+        }
+
+        // Расходы на транспорт
+        submission.setTransportCostMin(formDto.getTransportCostMin());
+        submission.setTransportCostMax(formDto.getTransportCostMax());
+
+        // Доход
+        submission.setIncomeMin(formDto.getIncomeMin());
+        submission.setIncomeMax(formDto.getIncomeMax());
+
+        // Домашний адрес
+        if (formDto.getHomeAddress() != null) {
+            AddressDto homeAddress = formDto.getHomeAddress();
+            if (homeAddress.getValue() != null) {
+                submission.setHomeReadableAddress(homeAddress.getValue());
+            }
+            JsonNode homePlaceJson = convertAddressToJsonNode(homeAddress);
+            if (homePlaceJson != null) {
+                submission.setHomeAddress(homePlaceJson);
+            }
+        }
+
+        // Дата передвижений
+        if (formDto.getMovementsDate() != null && !formDto.getMovementsDate().isEmpty()) {
+            try {
+                submission.setMovementsDate(LocalDate.parse(formDto.getMovementsDate()));
+            } catch (Exception e) {
+                // Игнорируем неверный формат даты
+            }
+        }
+
+        return submission;
     }
 
     /**

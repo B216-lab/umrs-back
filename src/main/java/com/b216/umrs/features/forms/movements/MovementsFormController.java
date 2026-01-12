@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/forms/movements")
+@RequestMapping("/api/v1/public/forms/movements")
 public class MovementsFormController {
 
     private final MovementsFormService movementsFormService;

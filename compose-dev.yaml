@@ -14,7 +14,7 @@ services:
             MP_SMTP_AUTH_ACCEPT_ANY: 1
             MP_SMTP_AUTH_ALLOW_INSECURE: 1
         healthcheck:
-            test: ["CMD", "curl", "--silent", "--fail-with-body", "--max-time", "5", "http://localhost:8025/readyz"]
+            test: [ "CMD", "curl", "--silent", "--fail-with-body", "--max-time", "5", "http://localhost:8025/readyz" ]
             interval: 15s
             timeout: 5s
             retries: 2
@@ -38,6 +38,21 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+        networks:
+            - shared-net
+
+    pgweb:
+        container_name: pgweb
+        restart: always
+        image: sosedoff/pgweb:0.17.0
+        ports:
+            - "8082:8081"
+        links:
+            - postgres:postgres
+        environment:
+            - PBWEB_DATABASE_URL=postgres://myuser:secret@localhost:32779/mydatabase?sslmode=disable
+        depends_on:
+            - postgres
         networks:
             - shared-net
 

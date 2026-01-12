@@ -82,6 +82,13 @@ public class Movement {
     private OffsetDateTime createdAt;
 
     /**
+     * Ссылка на отправку формы перемещений, к которой относится это перемещение.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movements_form_submission_id", nullable = false)
+    private com.b216.umrs.features.forms.movements.domain.MovementsFormSubmission movementsFormSubmission;
+
+    /**
      * Устанавливает время создания перед сохранением в базу данных.
      */
     @PrePersist

@@ -71,7 +71,6 @@ CREATE TABLE IF NOT EXISTS scopes
     name VARCHAR(255) NOT NULL UNIQUE
 );
 
--- TODO make username unique after legacy migration
 -- Table for users
 CREATE TABLE IF NOT EXISTS users
 (
@@ -92,6 +91,39 @@ CREATE TABLE IF NOT EXISTS users
     last_login              DATE    DEFAULT CURRENT_DATE,
     creation_date           DATE    DEFAULT CURRENT_DATE
 );
+
+-- Table for movements form submissions (stores user data from form, can be anonymous or linked to user)
+CREATE TABLE IF NOT EXISTS movements_form_submissions
+(
+    id                      BIGSERIAL PRIMARY KEY,
+    user_id                 BIGINT REFERENCES users (id) ON DELETE SET NULL,
+    birthday                DATE,
+    gender                  VARCHAR(10),
+    social_status_id        BIGINT REFERENCES social_statuses (id),
+    transport_cost_min      INTEGER,
+    transport_cost_max      INTEGER,
+    income_min              INTEGER,
+    income_max              INTEGER,
+    home_address            JSONB,
+    home_readable_address   VARCHAR(512),
+    movements_date          DATE,
+    created_at              TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_movements_form_submissions_user_id ON movements_form_submissions (user_id);
+
+-- Add foreign key column to movements table linking to movements_form_submissions
+-- Note: Since this is V1 migration, there should be no existing data, so we can add it as NOT NULL
+ALTER TABLE movements
+ADD COLUMN IF NOT EXISTS movements_form_submission_id BIGINT NOT NULL;
+
+ALTER TABLE movements
+ADD CONSTRAINT fk_movements_form_submission 
+FOREIGN KEY (movements_form_submission_id) 
+REFERENCES movements_form_submissions (id) 
+ON DELETE CASCADE;
+
+CREATE INDEX IF NOT EXISTS idx_movements_movements_form_submission_id ON movements (movements_form_submission_id);
 
 -- Association table: users_roles (Many-to-Many between users and roles)
 CREATE TABLE IF NOT EXISTS users_roles
