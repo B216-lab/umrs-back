@@ -10,7 +10,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.ott.OneTimeToken;
 import org.springframework.security.web.authentication.ott.OneTimeTokenGenerationSuccessHandler;
 import org.springframework.security.web.authentication.ott.RedirectOneTimeTokenGenerationSuccessHandler;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -19,11 +21,8 @@ public class EmailMagicLinkHandler implements OneTimeTokenGenerationSuccessHandl
     @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${spring.mail.username:}")
+    @Value("${spring.mail.username}")
     private String fromAddress;
-
-    @Value("${app.mail.enabled:false}")
-    private boolean mailEnabled;
 
     private final OneTimeTokenGenerationSuccessHandler redirectHandler =
         new RedirectOneTimeTokenGenerationSuccessHandler("/ott/check-email");
@@ -31,16 +30,8 @@ public class EmailMagicLinkHandler implements OneTimeTokenGenerationSuccessHandl
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        OneTimeToken token) throws IOException, ServletException {
-        if (!mailEnabled) {
-            // Публичный режим: почта отключена, отправка одноразового токена по email не выполняется.
-            redirectHandler.handle(request, response, token);
-            return;
-        }
-
         SimpleMailMessage message = new SimpleMailMessage();
-        if (fromAddress != null && !fromAddress.isBlank()) {
-            message.setFrom(fromAddress);
-        }
+        message.setFrom(fromAddress);
         message.setTo(token.getUsername().trim());
         message.setSubject("Your one-time login code");
         message.setText("Your one-time login token: " + token.getTokenValue());
