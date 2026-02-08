@@ -40,7 +40,7 @@ server:
 logging:
     level:
         # Root logger level (TRACE, DEBUG, INFO, WARN, ERROR, OFF)
-        root: ${LOGGING_LEVEL_ROOT:INFO}
+        root: ${LOGGING_LEVEL_ROOT:DEBUG}
         # Hibernate SQL logging
         org.hibernate.SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:error}
         # Hibernate parameter binding logging
