@@ -51,8 +51,9 @@ logging:
         com.b216.umrs: ${LOGGING_LEVEL_APP:INFO}
     file.path: ${LOGGING_FILE_PATH:logs/myapp.log}
 
-springdoc:
-    api-docs.path: /docs
+#springdoc:
+#    api-docs.path: /docs
+#    show-actuator: true
 
 app:
     admin:

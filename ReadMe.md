@@ -18,12 +18,6 @@ or using devcontainer:
 devcontainer up
 ```
 
-## 📖 Usage
-
-- `http://localhost:8081/redoc-v1.html` - [Redoc](https://redocly.com/redoc)
-- `http://localhost:8081/docs/v1` - [Open API](https://swagger.io/specification/) JSON
-- `http://localhost:8025` - MailPit
-
 ## 📝 License
 
 This project is licensed under the GPL-3.0 license - see the LICENSE file for details.

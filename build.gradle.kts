@@ -39,7 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("tools.jackson.core:jackson-databind")
     implementation("org.springframework.session:spring-session-jdbc")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
+    // implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
     implementation("org.hibernate.orm:hibernate-spatial")
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
