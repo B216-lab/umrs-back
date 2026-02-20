@@ -1,7 +1,6 @@
 package com.b216.umrs.features.auth;
 
 import com.b216.umrs.features.auth.util.TestUserFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Интеграционные тесты для аутентификации с использованием реальных пользователей в базе данных.

@@ -1,7 +1,6 @@
 package com.b216.umrs.features.auth.domain;
 
 import com.b216.umrs.features.auth.model.Gender;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -21,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import tools.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.time.LocalDate;

@@ -1,8 +1,8 @@
 package com.b216.umrs.config;
 
 import com.b216.umrs.features.auth.model.Role;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,16 +19,12 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import tools.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Configuration
@@ -41,11 +37,15 @@ public class SecurityConfig {
      * Может быть задано через переменную окружения CORS_ALLOWED_ORIGINS (через запятую).
      * По умолчанию используются значения для разработки.
      */
-    @Value("${cors.allowed.origins:http://localhost:5173,http://localhost:3000,http://manual-geoform:5173,http://manual-geoform:80,http://frontend:5173,http://frontend:80}")
+    @Value("${cors.allowed.origins:http://localhost:5173,http://localhost:3000,http://frontend:5173,http://frontend:80}")
     private String corsAllowedOrigins;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+        HttpSecurity http,
+        AuthenticationEntryPoint authenticationEntryPoint,
+        AccessDeniedHandler accessDeniedHandler
+    ) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(httpSecuritySessionManagementConfigurer ->
@@ -55,7 +55,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 // Use cookie-based CSRF tokens that are readable from JavaScript (for SPA clients)
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // Public forms endpoints are consumed without CSRF tokens (e.g. embedded Vueform),
+                // Public forms endpoints are consumed without CSRF tokens (e.g. embedded form),
                 // so CSRF protection is not applied there
                 .ignoringRequestMatchers("/api/v1/public/forms/**")
             )
@@ -84,8 +84,8 @@ public class SecurityConfig {
             })
             .exceptionHandling(exceptionHandlingConfigurer -> {
                 exceptionHandlingConfigurer
-                    .authenticationEntryPoint(authenticationEntryPoint())
-                    .accessDeniedHandler(accessDeniedHandler());
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .accessDeniedHandler(accessDeniedHandler);
             })
             .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable);
@@ -96,11 +96,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Парсим разрешённые origins из переменной окружения (разделённые запятой)
         List<String> allowedOrigins = parseAllowedOrigins(corsAllowedOrigins);
         configuration.setAllowedOrigins(allowedOrigins);
-        
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // Включает отправку cookies (JSESSIONID)
@@ -122,11 +122,11 @@ public class SecurityConfig {
         if (originsStr == null || originsStr.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        
+
         return Arrays.stream(originsStr.split(","))
-                .map(String::trim)
-                .filter(origin -> !origin.isEmpty())
-                .collect(Collectors.toList());
+            .map(String::trim)
+            .filter(origin -> !origin.isEmpty())
+            .collect(Collectors.toList());
     }
 
     @Bean
@@ -138,8 +138,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
         UserDetailsService userDetailsService,
         PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
 
         return new ProviderManager(authenticationProvider);
@@ -151,7 +150,7 @@ public class SecurityConfig {
      * @return
      */
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
+    public AuthenticationEntryPoint authenticationEntryPoint(ObjectMapper objectMapper) {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
@@ -159,7 +158,7 @@ public class SecurityConfig {
             body.put("error", "Unauthorized");
             body.put("message", authException.getMessage());
             body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-            new ObjectMapper().writeValue(response.getOutputStream(), body);
+            objectMapper.writeValue(response.getOutputStream(), body);
         };
     }
 
@@ -169,7 +168,7 @@ public class SecurityConfig {
      * @return
      */
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
+    public AccessDeniedHandler accessDeniedHandler(ObjectMapper objectMapper) {
         return (request, response, accessDeniedException) -> {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json;charset=UTF-8");
@@ -177,7 +176,7 @@ public class SecurityConfig {
             body.put("error", "Forbidden");
             body.put("message", accessDeniedException.getMessage());
             body.put("status", HttpServletResponse.SC_FORBIDDEN);
-            new ObjectMapper().writeValue(response.getOutputStream(), body);
+            objectMapper.writeValue(response.getOutputStream(), body);
         };
     }
 }

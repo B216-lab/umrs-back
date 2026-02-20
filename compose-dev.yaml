@@ -41,20 +41,20 @@ services:
         networks:
             - shared-net
 
-    pgweb:
-        container_name: pgweb
-        restart: always
-        image: sosedoff/pgweb:0.17.0
-        ports:
-            - "8082:8081"
-        links:
-            - postgres:postgres
-        environment:
-            - PBWEB_DATABASE_URL=postgres://myuser:secret@localhost:32779/mydatabase?sslmode=disable
-        depends_on:
-            - postgres
-        networks:
-            - shared-net
+#    pgweb:
+#        container_name: pgweb
+#        restart: always
+#        image: sosedoff/pgweb:0.17.0
+#        ports:
+#            - "8082:8081"
+#        links:
+#            - postgres:postgres
+#        environment:
+#            - PBWEB_DATABASE_URL=postgres://myuser:secret@localhost:32779/mydatabase?sslmode=disable
+#        depends_on:
+#            - postgres
+#        networks:
+#            - shared-net
 
 volumes:
     db-data:

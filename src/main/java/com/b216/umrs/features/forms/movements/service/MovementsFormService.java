@@ -1,8 +1,13 @@
 package com.b216.umrs.features.forms.movements.service;
 
+import com.b216.umrs.features.auth.model.Gender;
+import com.b216.umrs.features.auth.repository.SocialStatusRepository;
+import com.b216.umrs.features.auth.repository.UserRepository;
+import com.b216.umrs.features.forms.movements.domain.MovementsFormSubmission;
 import com.b216.umrs.features.forms.movements.dto.AddressDto;
 import com.b216.umrs.features.forms.movements.dto.MovementItemDto;
 import com.b216.umrs.features.forms.movements.dto.MovementsFormDto;
+import com.b216.umrs.features.forms.movements.repository.MovementsFormSubmissionRepository;
 import com.b216.umrs.features.movement.domain.Movement;
 import com.b216.umrs.features.movement.domain.MovementTypeRef;
 import com.b216.umrs.features.movement.domain.PlaceTypeRef;
@@ -11,23 +16,15 @@ import com.b216.umrs.features.movement.model.MovementType;
 import com.b216.umrs.features.movement.model.PlaceType;
 import com.b216.umrs.features.movement.model.ValidationStatus;
 import com.b216.umrs.features.movement.model.VehicleType;
-import com.b216.umrs.features.movement.repository.MovementRepository;
-import com.b216.umrs.features.movement.repository.MovementTypeRefRepository;
-import com.b216.umrs.features.movement.repository.PlaceTypeRefRepository;
-import com.b216.umrs.features.movement.repository.ValidationStatusRefRepository;
-import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
-import com.b216.umrs.features.auth.model.Gender;
-import com.b216.umrs.features.auth.repository.UserRepository;
-import com.b216.umrs.features.auth.repository.SocialStatusRepository;
-import com.b216.umrs.features.forms.movements.domain.MovementsFormSubmission;
-import com.b216.umrs.features.forms.movements.repository.MovementsFormSubmissionRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.b216.umrs.features.movement.repository.*;
 import com.mapbox.geojson.Point;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -54,15 +51,15 @@ public class MovementsFormService {
     private final ObjectMapper objectMapper;
 
     public MovementsFormService(
-            MovementRepository movementRepository,
-            MovementTypeRefRepository movementTypeRefRepository,
-            PlaceTypeRefRepository placeTypeRefRepository,
-            ValidationStatusRefRepository validationStatusRefRepository,
-            VehicleTypeRefRepository vehicleTypeRefRepository,
-            UserRepository userRepository,
-            SocialStatusRepository socialStatusRepository,
-            MovementsFormSubmissionRepository movementsFormSubmissionRepository,
-            ObjectMapper objectMapper
+        MovementRepository movementRepository,
+        MovementTypeRefRepository movementTypeRefRepository,
+        PlaceTypeRefRepository placeTypeRefRepository,
+        ValidationStatusRefRepository validationStatusRefRepository,
+        VehicleTypeRefRepository vehicleTypeRefRepository,
+        UserRepository userRepository,
+        SocialStatusRepository socialStatusRepository,
+        MovementsFormSubmissionRepository movementsFormSubmissionRepository,
+        ObjectMapper objectMapper
     ) {
         this.movementRepository = movementRepository;
         this.movementTypeRefRepository = movementTypeRefRepository;
@@ -95,8 +92,8 @@ public class MovementsFormService {
         // Обрабатываем перемещения
         LocalDate movementDate = parseDate(formDto.getMovementsDate());
         ValidationStatusRef pendingReviewStatus = validationStatusRefRepository
-                .findByCode(ValidationStatus.PENDING_REVIEW)
-                .orElseThrow(() -> new IllegalStateException("ValidationStatus PENDING_REVIEW not found"));
+            .findByCode(ValidationStatus.PENDING_REVIEW)
+            .orElseThrow(() -> new IllegalStateException("ValidationStatus PENDING_REVIEW not found"));
 
         List<Movement> savedMovements = new ArrayList<>();
 
@@ -283,23 +280,23 @@ public class MovementsFormService {
     /**
      * Преобразует DTO перемещения в сущность Movement.
      *
-     * @param movementItem DTO перемещения
-     * @param movementDate дата перемещения (используется для парсинга времени)
+     * @param movementItem     DTO перемещения
+     * @param movementDate     дата перемещения (используется для парсинга времени)
      * @param validationStatus статус валидации
      * @return сущность Movement
      */
     private Movement convertToMovement(
-            MovementItemDto movementItem,
-            LocalDate movementDate,
-            ValidationStatusRef validationStatus
+        MovementItemDto movementItem,
+        LocalDate movementDate,
+        ValidationStatusRef validationStatus
     ) {
         Movement movement = new Movement();
 
         // Тип перемещения
         MovementType movementType = MovementType.valueOf(movementItem.getMovementType());
         MovementTypeRef movementTypeRef = movementTypeRefRepository
-                .findByCode(movementType)
-                .orElseThrow(() -> new IllegalArgumentException("MovementType not found: " + movementItem.getMovementType()));
+            .findByCode(movementType)
+            .orElseThrow(() -> new IllegalArgumentException("MovementType not found: " + movementItem.getMovementType()));
         movement.setType(movementTypeRef);
 
         // Время отправления и прибытия
@@ -309,14 +306,14 @@ public class MovementsFormService {
         // Типы мест отправления и прибытия
         PlaceType departurePlaceType = PlaceType.valueOf(movementItem.getDeparturePlace());
         PlaceTypeRef departurePlaceTypeRef = placeTypeRefRepository
-                .findByCode(departurePlaceType)
-                .orElseThrow(() -> new IllegalArgumentException("PlaceType not found: " + movementItem.getDeparturePlace()));
+            .findByCode(departurePlaceType)
+            .orElseThrow(() -> new IllegalArgumentException("PlaceType not found: " + movementItem.getDeparturePlace()));
         movement.setDepartureType(departurePlaceTypeRef);
 
         PlaceType arrivalPlaceType = PlaceType.valueOf(movementItem.getArrivalPlace());
         PlaceTypeRef arrivalPlaceTypeRef = placeTypeRefRepository
-                .findByCode(arrivalPlaceType)
-                .orElseThrow(() -> new IllegalArgumentException("PlaceType not found: " + movementItem.getArrivalPlace()));
+            .findByCode(arrivalPlaceType)
+            .orElseThrow(() -> new IllegalArgumentException("PlaceType not found: " + movementItem.getArrivalPlace()));
         movement.setDestinationType(arrivalPlaceTypeRef);
 
         // Адреса (преобразуются в JsonNode и сохраняются читаемые адреса)
@@ -347,7 +344,7 @@ public class MovementsFormService {
             try {
                 VehicleType vehicleType = VehicleType.valueOf(firstTransport);
                 vehicleTypeRefRepository.findByCode(vehicleType)
-                        .ifPresent(movement::setVehicleType);
+                    .ifPresent(movement::setVehicleType);
             } catch (IllegalArgumentException e) {
                 // Игнорируем неверный тип транспорта
             }
@@ -396,16 +393,16 @@ public class MovementsFormService {
         // Извлекаем координаты напрямую из DTO
         Double latitude = addressDto.getLatitude();
         Double longitude = addressDto.getLongitude();
-        
+
         if (latitude != null && longitude != null) {
             try {
                 // Создаём GeoJSON Point используя mapbox-java (longitude, latitude)
                 Point geoJsonPoint = Point.fromLngLat(longitude, latitude);
-                
+
                 // Преобразуем Point в JsonNode через toJson() метод
                 String geoJsonString = geoJsonPoint.toJson();
                 return objectMapper.readTree(geoJsonString);
-            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            } catch (JacksonException e) {
                 // Если не удалось создать GeoJSON, возвращаем null
                 return null;
             } catch (Exception e) {
@@ -413,7 +410,7 @@ public class MovementsFormService {
                 return null;
             }
         }
-        
+
         // Если координаты отсутствуют, возвращаем null
         return null;
     }
@@ -435,7 +432,7 @@ public class MovementsFormService {
      * Парсит строку времени и комбинирует с датой для создания OffsetDateTime.
      *
      * @param timeStr строка времени в формате "HH:mm"
-     * @param day дата
+     * @param day     дата
      * @return OffsetDateTime
      */
     private OffsetDateTime parseTime(String timeStr, LocalDate day) {

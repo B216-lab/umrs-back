@@ -1,10 +1,10 @@
 package com.b216.umrs.infrastructure.persistence;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Конвертер JsonNode <-> String для хранения в колонке JSONB.
@@ -21,7 +21,7 @@ public class JsonNodeStringConverter implements AttributeConverter<JsonNode, Str
         }
         try {
             return OBJECT_MAPPER.writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Невозможно сериализовать JsonNode", e);
         }
     }
@@ -33,7 +33,7 @@ public class JsonNodeStringConverter implements AttributeConverter<JsonNode, Str
         }
         try {
             return OBJECT_MAPPER.readTree(dbData);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             throw new IllegalArgumentException("Невозможно десериализовать JsonNode", e);
         }
     }

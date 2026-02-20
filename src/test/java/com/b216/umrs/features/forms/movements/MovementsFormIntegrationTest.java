@@ -4,7 +4,6 @@ import com.b216.umrs.features.auth.util.TestUserFactory;
 import com.b216.umrs.features.forms.movements.dto.AddressDto;
 import com.b216.umrs.features.forms.movements.dto.MovementItemDto;
 import com.b216.umrs.features.forms.movements.dto.MovementsFormDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +21,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Integration tests for movements form.
