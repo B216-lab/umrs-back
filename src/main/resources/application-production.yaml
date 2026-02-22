@@ -1,8 +1,4 @@
-###################################### production environment properties
 spring:
-    config.import: optional:file:.env[.properties]
-    application.name: umrs-backend
-    banner.location: banner.txt
     mail:
         host: ${MAIL_HOST}
         port: ${MAIL_PORT}
@@ -13,63 +9,23 @@ spring:
             mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE}
             mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED}
             mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST}
-    jpa:
-        hibernate.ddl-auto: update
     datasource:
         url: ${SPRING_DATASOURCE_URL}
         username: ${SPRING_DATASOURCE_USERNAME}
         password: ${SPRING_DATASOURCE_PASSWORD}
-        driver-class-name: org.postgresql.Driver
-    flyway:
-        enabled: true
-        url: ${spring.datasource.url}
-        user: ${spring.datasource.username}
-        password: ${spring.datasource.password}
-    # Spring Data REST base path for rest repositories
-    data.rest.base-path: /api/v1
-    threads.virtual.enabled: true
-    session:
-        store-type: jdbc
-        jdbc:
-            initialize-schema: never  # Используем Flyway для миграций
-        timeout: 30m  # Время жизни сессии (30 минут)
 
 server:
     port: ${SERVER_PORT}
-
-logging:
-    level:
-        # Root logger level (TRACE, DEBUG, INFO, WARN, ERROR, OFF)
-        root: ${LOGGING_LEVEL_ROOT:DEBUG}
-        # Hibernate SQL logging
-        org.hibernate.SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:error}
-        # Hibernate parameter binding logging
-        org.hibernate.type.descriptor.sql: ${LOGGING_LEVEL_HIBERNATE_TYPE:OFF}
-        # Spring Security logging
-        org.springframework.security: ${LOGGING_LEVEL_SPRING_SECURITY:error}
-        # Application package logging (adjust package name as needed)
-        com.b216.umrs: ${LOGGING_LEVEL_APP:INFO}
-    file.path: ${LOGGING_FILE_PATH:logs/myapp.log}
-
-springdoc:
-    api-docs.path: /docs
 
 app:
     admin:
         username: ${APP_ADMIN_USERNAME}
         password: ${APP_ADMIN_PASSWORD}
 
-# Actuator health checks configuration
-management:
-    health:
-        # Отключает проверку здоровья почтового сервиса, если почта отключена
-        mail:
-            enabled: ${APP_MAIL_ENABLED:false}
 
 # CORS configuration
 cors:
     # Разрешённые origins для CORS (через запятую, с портами)
     # Пример: https://example.com:443,https://app.example.com:443
-    # Должно быть задано через переменную окружения CORS_ALLOWED_ORIGINS
     allowed:
         origins: ${CORS_ALLOWED_ORIGINS}

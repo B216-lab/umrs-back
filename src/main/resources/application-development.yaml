@@ -1,0 +1,45 @@
+spring:
+    mail:
+        host: ${MAIL_HOST:localhost}
+        port: ${MAIL_PORT:1025}
+        username: ${MAIL_USERNAME:app@umrs.ru}
+        password: ${MAIL_PASSWORD:some-password}
+        properties:
+            mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+            mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:false}
+            mail.smtp.starttls.required: ${MAIL_SMTP_STARTTLS_REQUIRED:false}
+            mail.smtp.ssl.trust: ${MAIL_SMTP_SSL_TRUST:localhost}
+    datasource:
+        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:32779/mydatabase}
+        username: ${SPRING_DATASOURCE_USERNAME:myuser}
+        password: ${SPRING_DATASOURCE_PASSWORD:secret}
+
+server:
+    port: ${SERVER_PORT:8081}
+
+app:
+    admin:
+        username: ${APP_ADMIN_USERNAME:admin@example.com}
+        password: ${APP_ADMIN_PASSWORD:some-admin-password}
+
+
+# CORS configuration
+cors:
+    # Разрешённые origins для CORS (через запятую, с портами)
+    # Пример: http://localhost:5173,https://example.com:443,http://frontend:80
+    allowed:
+        origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://manual-geoform:5173,http://manual-geoform:80,http://frontend:5173,http://frontend:80}
+
+
+logging:
+    level:
+        # Root logger level (TRACE, DEBUG, INFO, WARN, ERROR, OFF)
+        root: ${LOGGING_LEVEL_ROOT:INFO}
+        org.hibernate.SQL: ${LOGGING_LEVEL_HIBERNATE_SQL:debug}
+        # Hibernate parameter binding logging
+        org.hibernate.type.descriptor.sql: ${LOGGING_LEVEL_HIBERNATE_TYPE:trace}
+        # Spring Security logging
+        org.springframework.security: ${LOGGING_LEVEL_SPRING_SECURITY:DEBUG}
+        # Application package logging (adjust package name as needed)
+        com.b216.umrs: ${LOGGING_LEVEL_APP:INFO}
+    file.path: ${LOGGING_FILE_PATH:logs/myapp.log}
