@@ -17,6 +17,16 @@ or using devcontainer:
 ```bash
 devcontainer up
 ```
+## Agentic development
+Every new session should start with something like: 
+
+> Read AGENTS.md and confirm you understand the project constraints before doing anything
+
+Recommend to follow prompt structure:
+- GOAL
+- CONSTRAINTS
+- FORMAT
+- FAILURE CONDITIONS 
 
 ## 📝 License
 
