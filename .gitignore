@@ -37,12 +37,7 @@ out/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/launch.json
-!.vscode/settings.json
 
-logs
-legacy_forms_db_migration/road-survey_*.dump
-src/main/resources/application-prod.yaml
-src/main/resources/application-dev-mail.yaml
 
 # Environment variables
 .env.local
@@ -51,3 +46,4 @@ src/main/resources/application-dev-mail.yaml
 **/.env
 mailpit-data
 .gradle-local
+**/*.log

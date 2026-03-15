@@ -1,23 +1,15 @@
 {
-    "name": "UMRS Backend Dev",
-    "dockerComposeFile": [
-        "../compose-dev.yaml",
-        "docker-compose.yml"
-    ],
-    "service": "app",
+    "name": "UMRS Backend Dev - ITS BROKEN NOW",
+
     "workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
     "shutdownAction": "stopCompose",
     "postCreateCommand": "./gradlew --no-daemon --version",
     "forwardPorts": [
-        8081,
-        32779
+        8081
     ],
     "portsAttributes": {
         "8081": {
             "label": "Spring Boot"
-        },
-        "32779": {
-            "label": "PostgreSQL"
         }
     },
     "remoteUser": "vscode",
@@ -30,12 +22,16 @@
                 "editor.formatOnSave": true
             },
             "extensions": [
-                "vscjava.vscode-java-debug",
-                "redhat.java",
-                "vscjava.vscode-spring-boot-dashboard",
-                "vmware.vscode-spring-boot",
-                "richardwillis.vscode-gradle",
-                "redhat.vscode-yaml"
+              "vscjava.vscode-java-pack",
+
+              "vscjava.vscode-spring-boot-dashboard",
+              "vmware.vscode-spring-boot",
+
+              "exiasr.hadolint",
+              "editorconfig.editorconfig",
+
+              "github.vscode-pull-request-github",
+              "github.vscode-github-actions"
             ]
         }
     }
