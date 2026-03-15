@@ -41,7 +41,7 @@ class MovementsFormIntegrationTest {
 
     private static final String TEST_USER_EMAIL = "test_movements@test.local";
     private static final String TEST_USER_PASSWORD = "Test123!";
-    private static final String MOVEMENTS_FORM_ENDPOINT = "/api/v1/forms/movements";
+    private static final String MOVEMENTS_FORM_ENDPOINT = "/api/v1/public/forms/movements";
 
     @BeforeEach
     void setUp() {
