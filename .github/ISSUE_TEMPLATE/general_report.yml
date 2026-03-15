@@ -1,6 +1,6 @@
 name: General Report
 description: Provide general feedback or inquiries
-title: "[General]: "
+title: "[General] "
 labels: ["general"]
 assignees: []
 body:
