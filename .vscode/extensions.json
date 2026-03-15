@@ -1,11 +1,17 @@
 {
     "recommendations": [
-        "vscjava.vscode-java-debug",
-        "redhat.java",
+        "vscjava.vscode-java-pack",
+
         "vscjava.vscode-spring-boot-dashboard",
         "vmware.vscode-spring-boot",
+
         "ms-azuretools.vscode-containers",
         "anysphere.remote-containers",
-        "exiasr.hadolint"
+
+        "exiasr.hadolint",
+        "editorconfig.editorconfig",
+
+        "github.vscode-pull-request-github",
+        "github.vscode-github-actions",
     ]
 }
