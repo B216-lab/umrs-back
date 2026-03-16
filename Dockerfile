@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jdk-jammy AS build
+FROM eclipse-temurin:25-jdk-jammy AS build
 WORKDIR /workspace/app
 
 COPY gradlew gradlew
@@ -10,7 +10,7 @@ COPY src src
 RUN chmod +x gradlew \
     && ./gradlew --no-daemon clean bootJar -x test
 
-FROM eclipse-temurin:21-jre-jammy
+FROM eclipse-temurin:25-jre-jammy
 
 
 LABEL org.opencontainers.image.title="UMRS Backend" \
