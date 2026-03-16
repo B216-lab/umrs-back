@@ -56,7 +56,7 @@ jobs:
           source .env
 
       - name: Start stack
-        run: docker compose -f compose.yml up -d --build
+        run: docker compose -f ci-compose.yml up -d --build
 
       - name: Wait for app readiness
         run: |
@@ -66,9 +66,9 @@ jobs:
             fi
             sleep 2
           done
-          docker compose -f compose.yml logs app postgres
+          docker compose -f ci-compose.yml logs app postgres
           exit 1
 
       - name: Tear down stack
         if: always()
-        run: docker compose -f compose.yml down -v
+        run: docker compose -f ci-compose.yml down -v
