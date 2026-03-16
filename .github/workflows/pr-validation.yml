@@ -21,39 +21,25 @@ jobs:
           custom_labels: '{"feat": "feature", "fix": "fix", "docs": "documentation", "test": "test", "ci": "CI/CD", "refactor": "refactor", "perf": "performance", "chore": "chore", "revert": "revert", "wip": "WIP"}'
           add_label: "true"
 
-  hadolint:
-    name: Dockerfile lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-
-  docker-build:
-    name: Docker build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build image
-        run: docker build -t umrs-back:ci .
-
   docker-smoke:
     name: Docker runtime smoke check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
 
       - name: Prepare env file
         run: |
           cp .env.example .env
           source .env
+          
+      - name: Create network
+        run: docker network create shared-net
 
       - name: Start stack
         run: docker compose -f ci-compose.yml up -d --build
