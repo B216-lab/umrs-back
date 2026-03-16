@@ -21,54 +21,40 @@ jobs:
           custom_labels: '{"feat": "feature", "fix": "fix", "docs": "documentation", "test": "test", "ci": "CI/CD", "refactor": "refactor", "perf": "performance", "chore": "chore", "revert": "revert", "wip": "WIP"}'
           add_label: "true"
 
-  hadolint:
-    name: Dockerfile lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Hadolint
-        uses: hadolint/hadolint-action@v3.1.0
-        with:
-          dockerfile: Dockerfile
-
-  docker-build:
-    name: Docker build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Build image
-        run: docker build -t umrs-back:ci .
-
   docker-smoke:
     name: Docker runtime smoke check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
 
       - name: Prepare env file
         run: |
           cp .env.example .env
           source .env
+          
+      - name: Create network
+        run: docker network create shared-net
 
       - name: Start stack
-        run: docker compose -f compose.yml up -d --build
+        run: docker compose -f ci-compose.yml up -d --build
 
       - name: Wait for app readiness
         run: |
           for i in {1..30}; do
-            if curl --fail --silent http://localhost:8081/actuator/health > /dev/null; then
+            if curl --fail --silent http://localhost:8081/api/actuator/health > /dev/null; then
               exit 0
             fi
             sleep 2
           done
-          docker compose -f compose.yml logs app postgres
+          docker compose -f ci-compose.yml logs app postgres
           exit 1
 
       - name: Tear down stack
         if: always()
-        run: docker compose -f compose.yml down -v
+        run: docker compose -f ci-compose.yml down -v
