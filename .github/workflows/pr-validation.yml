@@ -11,15 +11,7 @@ permissions:
 
 jobs:
   pr-title:
-    name: Validate PR title
-    runs-on: ubuntu-latest
-    steps:
-      - name: Conventional PR title
-        uses: ytanikin/pr-conventional-commits@1.5.1
-        with:
-          task_types: '["feat","fix","docs","style","refactor","perf","test","build","ci","chore","revert"]'
-          custom_labels: '{"feat": "feature", "fix": "fix", "docs": "documentation", "test": "test", "ci": "CI/CD", "refactor": "refactor", "perf": "performance", "chore": "chore", "revert": "revert", "wip": "WIP"}'
-          add_label: "true"
+    uses: B216-lab/.github/.github/workflows/pr-title-validation.yml@main
 
   docker-smoke:
     name: Docker runtime smoke check
