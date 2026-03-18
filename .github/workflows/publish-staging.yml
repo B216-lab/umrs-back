@@ -9,6 +9,7 @@ jobs:
     uses: B216-lab/.github/.github/workflows/ssh-deploy.yml@main
     with:
       app_path: /opt/umrs-back
+      service_name: app
     secrets:
       DEPLOY_HOST: ${{ secrets.HOST }}
       DEPLOY_USERNAME: ${{ secrets.USERNAME }}
