@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -57,24 +58,35 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 // Public forms endpoints are consumed without CSRF tokens (e.g. embedded form),
                 // so CSRF protection is not applied there
-                .ignoringRequestMatchers("/api/v1/public/forms/**")
+                .ignoringRequestMatchers(
+                    "/api/v1/public/forms/**",
+                    "/v1/public/forms/**",
+                    "/api/v1/public/forms/movements",
+                    "/v1/public/forms/movements"
+                )
             )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/manager/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.name(), Role.DEVELOPER.name(), Role.MANAGER.name(), Role.ADMIN.name())
-                .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
-                .requestMatchers("/api/v1/public/**").permitAll()
-                .requestMatchers("/api/v1/signup/**").permitAll()
-                .requestMatchers("/api/v1/auth/login").permitAll()
-                .requestMatchers("/api/v1/auth/logout").permitAll()
-                .requestMatchers("/api/v1/auth/ott").permitAll()
-                .requestMatchers("/api/v1/auth/submit-ott").permitAll()
-                .requestMatchers("/api/v1/auth/me").authenticated()
-                .requestMatchers("/api/v1/auth/csrf").permitAll()
-                .requestMatchers("/api/actuator/health").permitAll()
-                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests(auth -> {
+                auth
+                    .requestMatchers("/api/v1/developer/**").hasAnyRole(Role.DEVELOPER.name(), Role.ADMIN.name())
+                    .requestMatchers("/api/v1/manager/**").hasAnyRole(Role.MANAGER.name(), Role.ADMIN.name())
+                    .requestMatchers("/api/v1/user/**").hasAnyRole(Role.USER.name(), Role.DEVELOPER.name(), Role.MANAGER.name(), Role.ADMIN.name())
+                    .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/public/forms/movements").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/v1/public/forms/movements").permitAll()
+                    .requestMatchers("/api/v1/public/**").permitAll()
+                    .requestMatchers("/v1/public/**").permitAll()
+                    .requestMatchers("/api/v1/signup/**").permitAll()
+                    .requestMatchers("/api/v1/auth/login").permitAll()
+                    .requestMatchers("/api/v1/auth/logout").permitAll()
+                    .requestMatchers("/api/v1/auth/ott").permitAll()
+                    .requestMatchers("/api/v1/auth/submit-ott").permitAll()
+                    .requestMatchers("/api/v1/auth/me").authenticated()
+                    .requestMatchers("/api/v1/auth/csrf").permitAll()
+                    .requestMatchers("/api/actuator/health").permitAll();
+
+                auth.anyRequest().authenticated();
+            })
             .logout(logoutConfigurer -> {
                 logoutConfigurer.logoutUrl("/logout");
                 logoutConfigurer.invalidateHttpSession(true);
@@ -98,8 +110,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Парсим разрешённые origins из переменной окружения (разделённые запятой)
-        List<String> allowedOrigins = parseAllowedOrigins(corsAllowedOrigins);
-        configuration.setAllowedOrigins(allowedOrigins);
+        List<String> allowedOriginPatterns = parseAllowedOrigins(corsAllowedOrigins);
+        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
