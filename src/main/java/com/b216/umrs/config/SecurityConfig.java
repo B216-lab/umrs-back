@@ -83,7 +83,14 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/auth/submit-ott").permitAll()
                     .requestMatchers("/api/v1/auth/me").authenticated()
                     .requestMatchers("/api/v1/auth/csrf").permitAll()
-                    .requestMatchers("/api/actuator/health").permitAll();
+                    .requestMatchers("/api/actuator/health").permitAll()
+                    .requestMatchers(
+                        "/v3/api-docs",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs.yaml",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                    ).permitAll();
 
                 auth.anyRequest().authenticated();
             })

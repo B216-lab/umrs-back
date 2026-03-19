@@ -38,7 +38,10 @@ management:
         web:
             base-path: /api/actuator
 
-        
-#springdoc:
-#    api-docs.path: /docs
-#    show-actuator: true
+springdoc:
+    api-docs:
+        enabled: false
+        path: /v3/api-docs
+    swagger-ui:
+        enabled: false
+        path: /swagger-ui.html

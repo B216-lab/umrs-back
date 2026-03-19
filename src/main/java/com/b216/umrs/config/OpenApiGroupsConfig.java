@@ -1,4 +1,4 @@
-/* package com.b216.umrs.config;
+package com.b216.umrs.config;
 
 import io.swagger.v3.oas.models.info.Info;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -13,8 +13,10 @@ public class OpenApiGroupsConfig {
         return GroupedOpenApi.builder()
             .group("v1")
             .pathsToMatch("/api/v1/**")
-            .addOpenApiCustomizer(openApi -> openApi.info(new Info().title("UMRS API v1").version("1")))
+            .addOpenApiCustomizer(openApi -> openApi.info(new Info()
+                .title("UMRS API")
+                .version("v1")
+                .description("REST API for UMRS backend")))
             .build();
     }
 }
- */
