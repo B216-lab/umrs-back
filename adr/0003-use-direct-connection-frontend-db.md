@@ -1,19 +1,19 @@
-# 3. Использовать прямое соединение между frontend'ом и БД
+# 3. Use Direct Connection Between Frontend and DB
 
-Дата: 2025-09-12
+Date: 2025-09-12
 
-## Статус
+## Status
 
-Отклонено
+Rejected
 
-## Контекст
+## Context
 
-Была мысть использовать просто на frontend'е прямое подключение к бд по строке подключения, чтобы быстрее разработка шла, без того, чтобы для каждой мелкой ерунды однотипной писать REST endpoint'ы. Да, настолько лень зашла, но раз это используется, то почему бы не применить здесь тоже сначала?
+The idea was to connect the frontend directly to the database via a connection string to speed up development and avoid writing REST endpoints for every small, repetitive task. Yes, it went that far—but if others use it, why not try it here first?
 
-## Решение
+## Decision
 
-Не использовать прямое соединение между фронт-эндом и бэк-эндом, используя эти "database security rules" или что-то в этом роде, из-за CVE-2024-45489 и растущей сложности поддержки этих правил по мере роста схемы БД (см.(https://youtu.be/2zcN2aQsUdc?si=80NfsuOA2KI770CH))
+Do not use a direct connection between the frontend and the database via "database security rules" or similar, due to CVE-2024-45489 and the growing maintenance burden of these rules as the DB schema grows (see https://youtu.be/2zcN2aQsUdc?si=80NfsuOA2KI770CH).
 
-## Последствия
+## Consequences
 
-Писать сразу сначала backend полностью, затрачивая чуть больше времени сразу
+Build the backend fully from the start, investing somewhat more time upfront.

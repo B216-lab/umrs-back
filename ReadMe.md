@@ -4,6 +4,9 @@
 ![Spring Boot Version](https://img.shields.io/badge/Spring%20Boot-4-indigo.svg)
 ![Postgres Version](https://img.shields.io/badge/PostgreSQL-18.3.6-blue.svg)
 
+## Contributing
+
+Look at [contributing.md](https://github.com/B216-lab/.github/blob/main/.github/.github/CONTRIBUTING.md)
 
 ## 📝 License
 

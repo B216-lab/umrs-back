@@ -1,26 +1,22 @@
-# 1. Использовать supabase
+# 1. Use Supabase
 
-Дата: 2025-08-12
+Date: 2025-08-12
 
-## Статус
+## Status
 
-Отклонено
+Rejected
 
-## Контекст
+## Context
 
-Перед тем, как начать проект backend'а было предложение просто сделать backend as a service, 
-заселфхостив supabase
+Before starting the backend project, there was a proposal to simply use backend-as-a-service by self-hosting Supabase.
 
-## Решение
+## Decision
 
-- Supabase - это fauxpen source на самом деле в какой-то незначительной (зависит от случая) мере.
-- В ошибках, в репозиториях этого Supabase, можно найти немало недовольных политикой работы с open source community
-- Supabase обновляется регулярно, не сильно обращая внимания на документирование для self-hosted, а его инфраструктура
-  не самая простая и поддерживать её, конфигурировать или справляться с появляющимися по тем или иным причинам
-  ошибками - сложная задача, подсильная или прям нормальным специалистм, или разработчикам supabase (субъективно)
-- Немало неприятных ограничений в self-hosted версии. Самым критичным является запрет создания более одного проекта в
-  одном instance'е Supabase, но помимо этого, там ещё хватает неудобств разного рода.
+- Supabase is fauxpen source to some extent (varies by use case).
+- In the issue trackers and repositories of Supabase, one can find many complaints about its open source community policy.
+- Supabase is updated regularly, without much attention to documenting the self-hosted setup. Its infrastructure is not the simplest, and maintaining, configuring, or troubleshooting errors that arise for various reasons is a complex task—feasible only for experienced specialists or Supabase developers (subjectively).
+- Many unwelcome limitations in the self-hosted version. The most critical is the prohibition of creating more than one project per Supabase instance, but beyond that, there are plenty of other inconveniences.
 
-## Последствия
+## Consequences
 
-Этот весь проект
+This entire project

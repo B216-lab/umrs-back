@@ -1,15 +1,15 @@
-# №. <Читаемый заголовок>
+# No. <Human-readable title>
 
-Дата: <2025-08-12>
+Date: <2025-08-12>
 
-## Статус
+## Status
 
-Отклонено | Принято
+Rejected | Accepted
 
-## Контекст
-
-
-## Решение
+## Context
 
 
-## Последствия
+## Decision
+
+
+## Consequences

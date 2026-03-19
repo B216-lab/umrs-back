@@ -1,22 +1,19 @@
-# 2. Использовать WebFlux
+# 2. Use WebFlux
 
 Date: 2025-08-15
 
-## Статус
+## Status
 
-Отклонено
+Rejected
 
-## Контекст
+## Context
 
-Не особо ясно насколько сложные будут операции выполняться на backend'е, из-за чего кажется, что для
-подстраховки стоит использовать супер произсодительный WebFlux, вместо Servlet stack или как это называется
+It was unclear how complex the backend operations would be, which made WebFlux seem appealing for its high throughput compared to the Servlet stack.
 
-## Решение
+## Decision
 
+Use Spring MVC. WebFlux is unnecessary for now. What matters initially is development speed, reliability, and scalability prospects.
 
-Использовать `Spring MVC`. В `WebFlux` точно нет необходимости в начале, пока что важна скорость разработки, надежность и перспектива масштабирования.
+## Consequences
 
-
-## Последствия
-
-Возможно придется потом переписывать наиболее тормозные участки кода (webflux может быть использован вместе с MVC), если они вообще появятся
+We may need to rewrite the slowest parts of the code later (WebFlux can be used alongside MVC) if they ever emerge.
