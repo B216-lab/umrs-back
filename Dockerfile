@@ -1,6 +1,8 @@
 FROM eclipse-temurin:25-jdk-jammy AS build
 WORKDIR /workspace/app
 
+ARG APP_VERSION=0.0.1-SNAPSHOT
+
 COPY gradlew gradlew
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle.kts ./
@@ -8,14 +10,16 @@ COPY build.gradle.kts settings.gradle.kts ./
 COPY src src
 
 RUN chmod +x gradlew \
-    && ./gradlew --no-daemon clean bootJar -x test
+    && ./gradlew --no-daemon clean bootJar -x test -PappVersion="${APP_VERSION}"
 
 FROM eclipse-temurin:25-jre-jammy
 
 
+ARG APP_VERSION=0.0.1-SNAPSHOT
+
 LABEL org.opencontainers.image.title="UMRS Backend" \
     org.opencontainers.image.description="Backend service for UMRS" \
-    org.opencontainers.image.version="0.0.0" \
+    org.opencontainers.image.version="${APP_VERSION}" \
     org.opencontainers.image.vendor="B216" \
     org.opencontainers.image.licenses="GPL-3.0" \
     org.opencontainers.image.authors="Kirill Zhilenkov & B216 Team" \

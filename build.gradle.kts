@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "com.b216"
-version = "0.0.1-SNAPSHOT"
+version = (findProperty("appVersion") as String?) ?: "0.0.1-SNAPSHOT"
 description = "Backend service"
 
 java {
@@ -59,6 +59,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.springframework.amqp:spring-rabbit-test")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     testImplementation("org.springframework.security:spring-security-test")

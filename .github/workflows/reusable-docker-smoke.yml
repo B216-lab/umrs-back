@@ -1,0 +1,43 @@
+name: Reusable Docker smoke
+
+on:
+  workflow_call:
+
+jobs:
+  docker-smoke:
+    name: Docker runtime smoke check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+      - name: Prepare env file
+        run: |
+          cp .env.example .env
+          source .env
+
+      - name: Create network
+        run: docker network create shared-net
+
+      - name: Start stack
+        run: docker compose -f ci-compose.yml up -d --build
+
+      - name: Wait for app readiness
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:8081/api/actuator/health > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f ci-compose.yml logs app postgres
+          exit 1
+
+      - name: Tear down stack
+        if: always()
+        run: docker compose -f ci-compose.yml down -v

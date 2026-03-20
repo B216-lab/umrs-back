@@ -1,9 +1,9 @@
 name: Publish Docker Image
 
+# Tag pushes use `.github/workflows/release.yml` (smoke test + OpenAPI + GHCR + GitHub Release).
+# Use this workflow to push an image manually without a full release.
+
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 env:
