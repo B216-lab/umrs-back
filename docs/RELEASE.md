@@ -21,9 +21,7 @@ The [Release workflow](../.github/workflows/release.yml) then:
 - Exports **OpenAPI** (`openapi.json` and `openapi.yaml`) and attaches them to the GitHub Release.
 - Builds and pushes a **Docker image** to GHCR with labels and image tags derived from the git tag; the JAR is built with matching `appVersion`.
 
-## Optional: restrict who can trigger releases
-
-If the repository defines a variable **`RELEASE_ALLOWED_ACTORS`** (comma-separated GitHub usernames), the workflow fails unless `github.actor` is in that list. Leave the variable unset to allow any collaborator who can push tags.
+Restricting who can create tags or run workflows is done in **repository or organization settings** (rulesets, branch/tag protection, environment protection), not in this workflow.
 
 ## Manual Docker image (without a tag release)
 

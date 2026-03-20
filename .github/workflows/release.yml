@@ -30,16 +30,6 @@ jobs:
             exit 1
           fi
 
-      - name: Optional release actor allow list
-        if: ${{ vars.RELEASE_ALLOWED_ACTORS != '' }}
-        env:
-          ALLOWLIST: ${{ vars.RELEASE_ALLOWED_ACTORS }}
-        run: |
-          if ! echo "$ALLOWLIST" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -Fxq "${{ github.actor }}"; then
-            echo "Release rejected: ${{ github.actor }} is not listed in repository variable RELEASE_ALLOWED_ACTORS."
-            exit 1
-          fi
-
   smoke:
     name: PR validation smoke (reuse)
     needs: verify-tag
