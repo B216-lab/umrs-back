@@ -11,7 +11,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   verify-tag:
@@ -19,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -36,7 +35,10 @@ jobs:
         env:
           ALLOWLIST: ${{ vars.RELEASE_ALLOWED_ACTORS }}
         run: |
-          echo "$ALLOWLIST" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -Fxq "${{ github.actor }}"
+          if ! echo "$ALLOWLIST" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -Fxq "${{ github.actor }}"; then
+            echo "Release rejected: ${{ github.actor }} is not listed in repository variable RELEASE_ALLOWED_ACTORS."
+            exit 1
+          fi
 
   smoke:
     name: PR validation smoke (reuse)
@@ -49,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Spring Gradle Build Action
         uses: spring-io/spring-gradle-build-action@v2
