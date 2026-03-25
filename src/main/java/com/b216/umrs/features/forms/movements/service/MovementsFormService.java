@@ -48,7 +48,7 @@ public class MovementsFormService {
     private final UserRepository userRepository;
     private final SocialStatusRepository socialStatusRepository;
     private final MovementsFormSubmissionRepository movementsFormSubmissionRepository;
-    private final ObjectMapper objectMapper;
+    private static final ObjectMapper GEO_JSON_OBJECT_MAPPER = new ObjectMapper();
 
     public MovementsFormService(
         MovementRepository movementRepository,
@@ -58,8 +58,7 @@ public class MovementsFormService {
         VehicleTypeRefRepository vehicleTypeRefRepository,
         UserRepository userRepository,
         SocialStatusRepository socialStatusRepository,
-        MovementsFormSubmissionRepository movementsFormSubmissionRepository,
-        ObjectMapper objectMapper
+        MovementsFormSubmissionRepository movementsFormSubmissionRepository
     ) {
         this.movementRepository = movementRepository;
         this.movementTypeRefRepository = movementTypeRefRepository;
@@ -69,7 +68,6 @@ public class MovementsFormService {
         this.userRepository = userRepository;
         this.socialStatusRepository = socialStatusRepository;
         this.movementsFormSubmissionRepository = movementsFormSubmissionRepository;
-        this.objectMapper = objectMapper;
     }
 
     /**
@@ -401,7 +399,7 @@ public class MovementsFormService {
 
                 // Преобразуем Point в JsonNode через toJson() метод
                 String geoJsonString = geoJsonPoint.toJson();
-                return objectMapper.readTree(geoJsonString);
+                return GEO_JSON_OBJECT_MAPPER.readTree(geoJsonString);
             } catch (JacksonException e) {
                 // Если не удалось создать GeoJSON, возвращаем null
                 return null;
