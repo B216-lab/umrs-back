@@ -16,7 +16,11 @@ import com.b216.umrs.features.movement.model.MovementType;
 import com.b216.umrs.features.movement.model.PlaceType;
 import com.b216.umrs.features.movement.model.ValidationStatus;
 import com.b216.umrs.features.movement.model.VehicleType;
-import com.b216.umrs.features.movement.repository.*;
+import com.b216.umrs.features.movement.repository.MovementRepository;
+import com.b216.umrs.features.movement.repository.MovementTypeRefRepository;
+import com.b216.umrs.features.movement.repository.PlaceTypeRefRepository;
+import com.b216.umrs.features.movement.repository.ValidationStatusRefRepository;
+import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
 import com.mapbox.geojson.Point;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -380,14 +384,21 @@ public class MovementsFormService {
 
     /**
      * Преобразует адрес в GeoJSON Point для хранения в JSONB.
-     * Использует координаты из DTO для создания GeoJSON Point.
+     * Приоритет:
+     * 1) готовый GeoJSON из DTO;
+     * 2) сборка GeoJSON Point из latitude/longitude.
      *
-     * @param addressDto DTO адреса с координатами
-     * @return JsonNode с GeoJSON Point или null, если координаты отсутствуют
+     * @param addressDto DTO адреса
+     * @return JsonNode с GeoJSON Point или null, если данных недостаточно
      */
     private JsonNode convertAddressToJsonNode(AddressDto addressDto) {
         if (addressDto == null) {
             return null;
+        }
+
+        JsonNode providedGeoJson = addressDto.getGeoJson();
+        if (isValidGeoJsonPoint(providedGeoJson)) {
+            return providedGeoJson.deepCopy();
         }
 
         // Извлекаем координаты напрямую из DTO
@@ -413,6 +424,16 @@ public class MovementsFormService {
 
         // Если координаты отсутствуют, возвращаем null
         return null;
+    }
+
+    private boolean isValidGeoJsonPoint(JsonNode geoJson) {
+        return geoJson != null
+            && geoJson.isObject()
+            && geoJson.hasNonNull("type")
+            && "Point".equals(geoJson.get("type").asText())
+            && geoJson.hasNonNull("coordinates")
+            && geoJson.get("coordinates").isArray()
+            && geoJson.get("coordinates").size() == 2;
     }
 
     /**
