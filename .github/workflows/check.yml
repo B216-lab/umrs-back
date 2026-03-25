@@ -12,6 +12,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:18-3.6-alpine
+        env:
+          POSTGRES_DB: mydatabase
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U myuser -d mydatabase"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      SPRING_PROFILES_ACTIVE: development
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: secret
+      UMRS_RUN_INTEGRATION_TESTS: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,4 +41,4 @@ jobs:
           java-version: '25'
           distribution: 'corretto'
       - name: Build project
-        run: ./gradlew build -x test
+        run: ./gradlew build

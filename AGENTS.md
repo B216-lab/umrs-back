@@ -6,6 +6,7 @@
 ## 1. Git
 
 - Use conventional commit messages; title ≤ 100 characters
+- Use conventional PR titles
 - Never install a new dependency without asking first
 - Never modify the database schema without showing the migration plan
 
