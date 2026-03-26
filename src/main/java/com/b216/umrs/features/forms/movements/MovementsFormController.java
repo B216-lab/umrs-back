@@ -1,11 +1,18 @@
 package com.b216.umrs.features.forms.movements;
 
 import com.b216.umrs.features.forms.movements.dto.MovementsFormDto;
+import com.b216.umrs.features.forms.movements.dto.RespondentKeyValidationResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import com.b216.umrs.features.forms.movements.service.MovementsFormService;
 import com.b216.umrs.features.movement.domain.Movement;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Validated
+@RequiredArgsConstructor
 @RequestMapping({
     "/api/v1/public/forms/movements",
     "/v1/public/forms/movements"
@@ -22,8 +31,12 @@ public class MovementsFormController {
 
     private final MovementsFormService movementsFormService;
 
-    public MovementsFormController(MovementsFormService movementsFormService) {
-        this.movementsFormService = movementsFormService;
+    @GetMapping("/respondent-key/validate")
+    public RespondentKeyValidationResponse validateRespondentKey(
+        @RequestParam @NotBlank String respondentKey
+    ) {
+        movementsFormService.validateRespondentKey(respondentKey);
+        return new RespondentKeyValidationResponse(true);
     }
 
     /**
@@ -33,7 +46,7 @@ public class MovementsFormController {
      * @return ResponseEntity с сообщением об успешной обработке и количеством сохранённых перемещений
      */
     @PostMapping
-    public ResponseEntity<Map<String, Object>> submitForm(@RequestBody MovementsFormDto formDto) {
+    public ResponseEntity<Map<String, Object>> submitForm(@Valid @RequestBody MovementsFormDto formDto) {
         List<Movement> savedMovements = movementsFormService.processForm(formDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
             "message", "Данные формы успешно обработаны и сохранены",

@@ -33,6 +33,10 @@ public class MovementsFormSubmission {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "respondent_key_id")
+    private MovementsFormRespondentKey respondentKey;
+
     /**
      * День рождения из формы.
      */
