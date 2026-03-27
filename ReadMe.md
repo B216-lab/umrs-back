@@ -4,6 +4,19 @@
 ![Spring Boot Version](https://img.shields.io/badge/Spring%20Boot-4-indigo.svg)
 ![Postgres Version](https://img.shields.io/badge/PostgreSQL-18.3.6-blue.svg)
 
+## Getting Started
+
+### Prerequisites
+- Java 25 JDK
+- Docker (for PostgreSQL 18.3.6)
+- Gradle 8.x+
+
+### Setup and Run
+1. Clone the repository: `git clone https://github.com/B216-lab/umrs-back.git`
+2. Start the database: `docker-compose up -d`
+3. Build the project: `./gradlew build`
+4. Run the application: `./gradlew bootRun`
+
 ## OpenAPI and Swagger (development)
 
 Swagger and OpenAPI are exposed only when the `development` profile is active.
