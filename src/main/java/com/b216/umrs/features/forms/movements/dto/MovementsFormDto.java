@@ -1,5 +1,6 @@
 package com.b216.umrs.features.forms.movements.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,6 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 public class MovementsFormDto {
+    @NotBlank
+    private String respondentKey;
     private String birthday;
     private String gender;
     private String socialStatus;

@@ -1,8 +1,10 @@
 package com.b216.umrs.features.forms.movements.service;
 
+import com.b216.umrs.features.auth.domain.User;
 import com.b216.umrs.features.auth.model.Gender;
 import com.b216.umrs.features.auth.repository.SocialStatusRepository;
 import com.b216.umrs.features.auth.repository.UserRepository;
+import com.b216.umrs.features.forms.movements.domain.MovementsFormRespondentKey;
 import com.b216.umrs.features.forms.movements.domain.MovementsFormSubmission;
 import com.b216.umrs.features.forms.movements.dto.AddressDto;
 import com.b216.umrs.features.forms.movements.dto.MovementItemDto;
@@ -16,7 +18,11 @@ import com.b216.umrs.features.movement.model.MovementType;
 import com.b216.umrs.features.movement.model.PlaceType;
 import com.b216.umrs.features.movement.model.ValidationStatus;
 import com.b216.umrs.features.movement.model.VehicleType;
-import com.b216.umrs.features.movement.repository.*;
+import com.b216.umrs.features.movement.repository.MovementRepository;
+import com.b216.umrs.features.movement.repository.MovementTypeRefRepository;
+import com.b216.umrs.features.movement.repository.PlaceTypeRefRepository;
+import com.b216.umrs.features.movement.repository.ValidationStatusRefRepository;
+import com.b216.umrs.features.movement.repository.VehicleTypeRefRepository;
 import com.mapbox.geojson.Point;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -48,6 +54,7 @@ public class MovementsFormService {
     private final UserRepository userRepository;
     private final SocialStatusRepository socialStatusRepository;
     private final MovementsFormSubmissionRepository movementsFormSubmissionRepository;
+    private final MovementsFormRespondentKeyService respondentKeyService;
     private static final ObjectMapper GEO_JSON_OBJECT_MAPPER = new ObjectMapper();
 
     public MovementsFormService(
@@ -58,7 +65,9 @@ public class MovementsFormService {
         VehicleTypeRefRepository vehicleTypeRefRepository,
         UserRepository userRepository,
         SocialStatusRepository socialStatusRepository,
-        MovementsFormSubmissionRepository movementsFormSubmissionRepository
+        MovementsFormSubmissionRepository movementsFormSubmissionRepository,
+        MovementsFormRespondentKeyService respondentKeyService,
+        ObjectMapper objectMapper
     ) {
         this.movementRepository = movementRepository;
         this.movementTypeRefRepository = movementTypeRefRepository;
@@ -68,6 +77,8 @@ public class MovementsFormService {
         this.userRepository = userRepository;
         this.socialStatusRepository = socialStatusRepository;
         this.movementsFormSubmissionRepository = movementsFormSubmissionRepository;
+        this.respondentKeyService = respondentKeyService;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -80,12 +91,14 @@ public class MovementsFormService {
      */
     @Transactional
     public List<Movement> processForm(MovementsFormDto formDto) {
+        MovementsFormRespondentKey respondentKey = validateRespondentKey(formDto.getRespondentKey());
+
         // Создаём запись MovementsFormSubmission
-        MovementsFormSubmission formSubmission = createMovementsFormSubmission(formDto);
+        MovementsFormSubmission formSubmission = createMovementsFormSubmission(formDto, respondentKey);
         formSubmission = movementsFormSubmissionRepository.save(formSubmission);
 
-        // Обновляем профиль пользователя, если пользователь аутентифицирован
-        updateUserProfile(formDto);
+        // Обновляем профиль пользователя только для владельца respondent key
+        updateUserProfile(formDto, respondentKey);
 
         // Обрабатываем перемещения
         LocalDate movementDate = parseDate(formDto.getMovementsDate());
@@ -107,20 +120,32 @@ public class MovementsFormService {
         return savedMovements;
     }
 
+    public MovementsFormRespondentKey validateRespondentKey(String respondentKey) {
+        return respondentKeyService.getActiveRespondentKey(respondentKey);
+    }
+
     /**
      * Обновляет профиль текущего аутентифицированного пользователя данными из формы.
      *
      * @param formDto данные формы
      */
-    private void updateUserProfile(MovementsFormDto formDto) {
+    private void updateUserProfile(MovementsFormDto formDto, MovementsFormRespondentKey respondentKey) {
+        User respondentUser = respondentKey.getUser();
+        if (respondentUser == null) {
+            return;
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() ||
             "anonymous".equals(authentication.getPrincipal())) {
             return; // Пользователь не аутентифицирован
         }
 
-        String username = authentication.getName();
-        userRepository.findByUsername(username).ifPresent(user -> {
+        if (!authentication.getName().equals(respondentUser.getUsername())) {
+            return;
+        }
+
+        userRepository.findById(respondentUser.getId()).ifPresent(user -> {
             boolean updated = false;
 
             // Обновляем день рождения
@@ -202,16 +227,13 @@ public class MovementsFormService {
      * @param formDto данные формы
      * @return сущность MovementsFormSubmission
      */
-    private MovementsFormSubmission createMovementsFormSubmission(MovementsFormDto formDto) {
+    private MovementsFormSubmission createMovementsFormSubmission(
+        MovementsFormDto formDto,
+        MovementsFormRespondentKey respondentKey
+    ) {
         MovementsFormSubmission submission = new MovementsFormSubmission();
-
-        // Связываем с пользователем, если он аутентифицирован
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() &&
-            !"anonymous".equals(authentication.getPrincipal())) {
-            String username = authentication.getName();
-            userRepository.findByUsername(username).ifPresent(submission::setUser);
-        }
+        submission.setRespondentKey(respondentKey);
+        submission.setUser(respondentKey.getUser());
 
         // День рождения
         if (formDto.getBirthday() != null && !formDto.getBirthday().isEmpty()) {
